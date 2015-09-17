@@ -8,6 +8,9 @@ import (
     "appengine"
     "appengine/user"
     "appengine/datastore"
+    "appengine/urlfetch"
+    "io/ioutil"
+    "bytes"
 )
 
 func init() {
@@ -16,6 +19,7 @@ func init() {
     http.HandleFunc("/hello", handler)
     http.HandleFunc("/sign", sign)
     http.HandleFunc("/show", show)
+    http.HandleFunc("/zonito/webhook", send_request)
 }
 
 const guestbookForm = `
@@ -130,4 +134,22 @@ func handler(writer http.ResponseWriter, request *http.Request) {
         return
     }
     fmt.Fprintf(writer, "Hello, %v!", app_user)
+}
+
+func send_request(writer http.ResponseWriter, request *http.Request) {
+    context := appengine.NewContext(request)
+    client := urlfetch.Client(context)
+    url := ""
+    var jsonStr = []byte(`{"name":"Buy cheese and bread for breakfast."}`)
+    resp, err := client.Post(url, "application/json", bytes.NewBuffer(jsonStr))
+    if err != nil {
+        http.Error(writer, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    defer resp.Body.Close()
+    fmt.Fprintf(writer, "URL:>", url)
+    fmt.Fprintf(writer, "response Status:", resp.Status)
+    fmt.Fprintf(writer, "response Headers:", resp.Header)
+    body, _ := ioutil.ReadAll(resp.Body)
+    fmt.Fprintf(writer, "response Body:", string(body))
 }
