@@ -1,6 +1,12 @@
 indexes:
-- kind: Greeting
+- kind: Webhook
   ancestor: yes
   properties:
+  - name: Email
   - name: Date
+    direction: desc
+- kind: Webhook
+  ancestor: yes
+  properties:
+  - name: Handler
     direction: desc

@@ -4,5 +4,10 @@ runtime: go
 api_version: go1
 
 handlers:
+- url: /bower_components
+  static_dir: bower_components
+- url: /hook/.*
+  script: _go_app
 - url: /.*
   script: _go_app
+  login: required

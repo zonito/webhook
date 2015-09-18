@@ -1,10 +1,16 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>Webhook - {{.Title}}</title>
+    <title>Webhook - Start</title>
+    <script src="https://rawgit.com/webcomponents/webcomponentsjs/v0.7.3/webcomponents.min.js"></script>
+    <link rel="import" href="https://rawgit.com/Polymer/polymer/v1.0.3/polymer-micro.html">
+    <!-- Import element -->
+    <link rel="import" href="/bower_components/paper-input/paper-input.html" />
   </head>
   <body>
     <div id="content">
+      <h1>Hello World</h1>
+      <paper-input label="Your webhook handler"></paper-input>
       {{template "content" .}}
     </div>
   </body>
