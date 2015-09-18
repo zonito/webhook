@@ -3,16 +3,30 @@ package webhook
 import (
 	"appengine"
 	"appengine/datastore"
+  "net/http"
 )
 
+
+/***
+  * Return webhook datastore key.
+  */
 func webhookKey(context appengine.Context) *datastore.Key {
 	return datastore.NewKey(context, "Webhook", "default_webhook", 0, nil)
 }
 
+
+/***
+  * Return AccessToken datastore key.
+  */
 func accessTokenKey(context appengine.Context) *datastore.Key {
 	return datastore.NewKey(context, "AccessTokens", "default_at", 0, nil)
 }
 
+
+/***
+  * Return access token for provided email address.
+  * @param email, Email address of user.
+  */
 func getAccessToken(context appengine.Context, email string) string {
 	userAccessToken := datastore.NewQuery("AccessTokens").Ancestor(
 		accessTokenKey(context)).Filter("Email =", email).Limit(1)
@@ -24,7 +38,13 @@ func getAccessToken(context appengine.Context, email string) string {
 	return ""
 }
 
-func getAccessTokenFromHandler(context appengine.Context, handler string) string {
+
+/***
+  * Return access token from provided handler.
+  * @param handler, Handler for which find access token.
+  */
+func getAccessTokenFromHandler(
+    context appengine.Context, handler string) string {
 	webhook := getWebhookFromHandler(context, handler)
 	if webhook != nil {
 		return getAccessToken(context, webhook.Email)
@@ -32,6 +52,11 @@ func getAccessTokenFromHandler(context appengine.Context, handler string) string
 	return ""
 }
 
+
+/***
+  * Return list of webhooks (datastore entities) for given email.
+  * @param email, Email address of user.
+  */
 func getWebhooks(context appengine.Context, email string) []Webhook {
 	query := datastore.NewQuery("Webhook").Ancestor(
 		webhookKey(context)).Filter("Email =", email).Order("-Date").Limit(10)
@@ -40,7 +65,13 @@ func getWebhooks(context appengine.Context, email string) []Webhook {
 	return webhooks
 }
 
-func getWebhookFromHandler(context appengine.Context, handler string) *Webhook {
+
+/***
+  * Return list of webhooks (datastore entities) from given handler.
+  * @param handler, Hook handler.
+  */
+func getWebhookFromHandler(
+    context appengine.Context, handler string) *Webhook {
 	query := datastore.NewQuery("Webhook").Ancestor(
 		webhookKey(context)).Filter("Handler =", handler).Limit(1)
 	webhook := make([]Webhook, 0, 1)

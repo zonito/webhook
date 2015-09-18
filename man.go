@@ -21,18 +21,27 @@ var listTmpl = template.Must(
 var redirectTmpl = template.Must(
     template.ParseFiles("templates/callback.html"))
 
+
+/***
+  * Initialize Appengine.
+  * Only routes, that's it!
+  */
 func init() {
     route := mux.NewRouter()
     route.HandleFunc("/", root)
     route.HandleFunc("/cb", callback)
     route.HandleFunc("/connect", connect)
-    route.HandleFunc("/hooks/{handler}", hookHandler)
+    route.HandleFunc("/hooks/{handler}", hooks)
     route.HandleFunc("/redirect", redirect)
     route.HandleFunc("/save", save)
     route.HandleFunc("/trello/{type}/{boardid}", trelloList)
     http.Handle("/", route)
 }
 
+
+/***
+  * Root handler (/), show for to create new and list of created hooks.
+  */
 func root(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
@@ -40,75 +49,67 @@ func root(writer http.ResponseWriter, request *http.Request) {
         AccessToken string
         WH []Webhook
     }{getAccessToken(context, appUser.Email),
-        getWebhooks(context, appUser.Email)}
-    context.Infof("Token: %v", data.AccessToken)
+      getWebhooks(context, appUser.Email)}
     if err := listTmpl.Execute(writer, data); err != nil {
         http.Error(writer, err.Error(), http.StatusInternalServerError)
     }
 }
 
-func hookHandler(writer http.ResponseWriter, request *http.Request) {
+
+/***
+  * Actual webhook handler, receive events and post it to connected services.
+  */
+func hooks(writer http.ResponseWriter, request *http.Request) {
     vars := mux.Vars(request)
     handler := vars["handler"]
     context := appengine.NewContext(request)
-    context.Infof("Handler: %v", handler)
-    fmt.Fprintf(writer, "Url: %v", request.URL)
-    event := request.Header.Get("X-Github-Event")
-    event += " Event"
-    desc, _ := ioutil.ReadAll(request.Body)
-    context.Infof("Body: %s", desc)
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
-        context.Infof("id: %v", webhook.ListId)
-        var url bytes.Buffer
-        url.WriteString("https://api.trello.com/1/lists/")
-        url.WriteString(webhook.ListId)
-        url.WriteString("/cards?key=")
-        url.WriteString(trelloKey)
-        url.WriteString("&token=")
-        url.WriteString(getAccessTokenFromHandler(context, handler))
-        context.Infof("url: %v", url.String())
-        type PayLoad struct {
-            Name string
-            Desc string
+        decoder := json.NewDecoder(request.Body)
+        hookType := getHookType(request)
+        var event, desc string
+        if hookType == "github" {
+          event, desc = getGithubData(
+            decoder, request.Header.Get("X-Github-Event"))
+        } else if hookType == "doorbell" {
+          event, desc = getDoorbellData(decoder)
         }
-        context.Infof("des: ", string(desc))
-        payload := &PayLoad {
+        url := "https://api.trello.com/1/lists/" + webhook.ListId +
+          "/cards?key=" + trelloKey + "&token=" +
+          getAccessTokenFromHandler(context, handler)
+        payload := &TrelloPayLoad {
             Name: event,
             Desc: string(desc),
         }
-        str, err := json.Marshal(payload)
-        if err != nil {
-            context.Infof("Error", err)
-            return
-        }
-        jsonStr := string(str)
-        jsonStr = strings.Replace(jsonStr, "Name", "name", 1)
+        str, _ := json.Marshal(payload)
+        jsonStr := strings.Replace(string(str), "Name", "name", 1)
         jsonStr = strings.Replace(jsonStr, "Desc", "desc", 1)
-        context.Infof("json:", jsonStr)
         client := urlfetch.Client(context)
         resp, err := client.Post(
-            url.String(), "application/json", bytes.NewBuffer([]byte(jsonStr)))
+            url, "application/json", bytes.NewBuffer([]byte(jsonStr)))
         if err != nil {
             http.Error(writer, err.Error(), http.StatusInternalServerError)
             return
         }
         defer resp.Body.Close()
-        fmt.Fprintf(writer, "response Status:", resp.Status)
-        fmt.Fprintf(writer, "response Headers:", resp.Header)
+        context.Infof("response Headers:", resp.Header)
         body, _ := ioutil.ReadAll(resp.Body)
-        fmt.Fprintf(writer, "response Body:", string(body))
+        context.Infof("response Body:", string(body))
+        fmt.Fprintf(writer, "OK")
     }
 }
 
+
+/***
+  * Redirect use to get trello service approval.
+  */
 func connect(writer http.ResponseWriter, request *http.Request) {
-    var buffer bytes.Buffer
-    buffer.WriteString("https://trello.com/1/OAuthAuthorizeToken?key=")
-    buffer.WriteString(trelloKey)
-    buffer.WriteString("&callback_method=fragment&scope=read,write")
-    buffer.WriteString("&expiration=never&return_url=")
-    buffer.WriteString("http://pgwebhook.appspot.com/redirect")
-    http.Redirect(writer, request, buffer.String(), http.StatusFound)
+    authorizeUrl :=
+      "https://trello.com/1/OAuthAuthorizeToken" +
+      "?key=" + trelloKey + "&callback_method=fragment&scope=read,write" +
+      "&name=PGWebhook&scope=read,write&expiration=never" +
+      "&return_url=http://pgwebhook.appspot.com/redirect"
+    http.Redirect(writer, request, authorizeUrl, http.StatusFound)
 }
 
 
@@ -122,17 +123,16 @@ func redirect(writer http.ResponseWriter, request *http.Request) {
     }
 }
 
+
+/***
+  * Callback with token in post payload.
+  */
 func callback(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
-    url := request.URL.String()
-    index := strings.Index(url, "#")
-    token := request.FormValue("token")
-    fmt.Fprintf(writer, "URL: %v, %d", url, index)
-    context.Infof("Token: %v", token)
     appUser := user.Current(context)
     accessToken := AccessTokens {
         Email: appUser.Email,
-        AccessToken: token,
+        AccessToken: request.FormValue("token"),
     }
     key := datastore.NewIncompleteKey(
         context, "AccessTokens", accessTokenKey(context))
@@ -144,42 +144,37 @@ func callback(writer http.ResponseWriter, request *http.Request) {
     http.Redirect(writer, request, "/", http.StatusFound)
 }
 
+
+/***
+  * Get list of trello boards or lists.
+  */
 func trelloList(writer http.ResponseWriter, request *http.Request) {
     vars := mux.Vars(request)
     context := appengine.NewContext(request)
     appUser := user.Current(context)
     client := urlfetch.Client(context)
-    context.Infof("URL: %v", request.URL)
-    var buffer bytes.Buffer
-    url := "https://trello.com/1/members/me/boards"
+    url := "https://api.trello.com/1/members/me/boards"
     if vars["type"] == "lists" {
-        boardId := vars["boardid"]
-        var urlBuffer bytes.Buffer
-        urlBuffer.WriteString("https://api.trello.com/1/boards/")
-        urlBuffer.WriteString(boardId)
-        urlBuffer.WriteString("/lists")
-        url = urlBuffer.String()
+        url = "https://api.trello.com/1/boards/" + vars["boardid"] + "/lists"
     }
-    buffer.WriteString(url)
-    buffer.WriteString("?fields=name&key=")
-    buffer.WriteString(trelloKey)
-    buffer.WriteString("&token=")
-    buffer.WriteString(getAccessToken(context, appUser.Email))
-    context.Infof("Test: %v", buffer.String())
-    resp, err := client.Get(buffer.String())
+    url += "?fields=name&key=" + trelloKey + "&token=" +
+      getAccessToken(context, appUser.Email)
+    resp, err := client.Get(url)
     if err != nil {
         http.Error(writer, err.Error(), http.StatusInternalServerError)
         return
     }
     defer resp.Body.Close()
-    context.Infof("URL:>", buffer.String())
-    context.Infof("response Status:", resp.Status)
     context.Infof("response Headers:", resp.Header)
     body, _ := ioutil.ReadAll(resp.Body)
     writer.Header().Set("Content-Type", "application/json")
     fmt.Fprintf(writer, string(body))
 }
 
+
+/***
+  * Save new hook from web.
+  */
 func save(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
