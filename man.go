@@ -22,10 +22,8 @@ var redirectTmpl = template.Must(
     template.ParseFiles("templates/callback.html"))
 
 
-/***
-  * Initialize Appengine.
-  * Only routes, that's it!
-  */
+// Initialize Appengine.
+// Only routes, that's it!
 func init() {
     route := mux.NewRouter()
     route.HandleFunc("/", root)
@@ -39,9 +37,7 @@ func init() {
 }
 
 
-/***
-  * Root handler (/), show for to create new and list of created hooks.
-  */
+// Root handler (/), show for to create new and list of created hooks.
 func root(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
@@ -56,9 +52,7 @@ func root(writer http.ResponseWriter, request *http.Request) {
 }
 
 
-/***
-  * Actual webhook handler, receive events and post it to connected services.
-  */
+// Actual webhook handler, receive events and post it to connected services.
 func hooks(writer http.ResponseWriter, request *http.Request) {
     vars := mux.Vars(request)
     handler := vars["handler"]
@@ -100,9 +94,7 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
 }
 
 
-/***
-  * Redirect use to get trello service approval.
-  */
+// Redirect use to get trello service approval.
 func connect(writer http.ResponseWriter, request *http.Request) {
     authorizeUrl :=
       "https://trello.com/1/OAuthAuthorizeToken" +
@@ -113,10 +105,8 @@ func connect(writer http.ResponseWriter, request *http.Request) {
 }
 
 
-/***
-  * Once approval from service is done, read the token, make post request
-  * to callback handler (/cb) to save token.
-  */
+// Once approval from service is done, read the token, make post request
+// to callback handler (/cb) to save token.
 func redirect(writer http.ResponseWriter, request *http.Request) {
     if err := redirectTmpl.Execute(writer, nil); err != nil {
         http.Error(writer, err.Error(), http.StatusInternalServerError)
@@ -124,9 +114,7 @@ func redirect(writer http.ResponseWriter, request *http.Request) {
 }
 
 
-/***
-  * Callback with token in post payload.
-  */
+// Callback with token in post payload.
 func callback(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
@@ -145,9 +133,7 @@ func callback(writer http.ResponseWriter, request *http.Request) {
 }
 
 
-/***
-  * Get list of trello boards or lists.
-  */
+// Get list of trello boards or lists.
 func trelloList(writer http.ResponseWriter, request *http.Request) {
     vars := mux.Vars(request)
     context := appengine.NewContext(request)
@@ -172,9 +158,7 @@ func trelloList(writer http.ResponseWriter, request *http.Request) {
 }
 
 
-/***
-  * Save new hook from web.
-  */
+// Save new hook from web.
 func save(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
