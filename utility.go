@@ -9,37 +9,37 @@ import (
 
 // Return webhook datastore key.
 func webhookKey(context appengine.Context) *datastore.Key {
-	return datastore.NewKey(context, "Webhook", "default_webhook", 0, nil)
+  return datastore.NewKey(context, "Webhook", "default_webhook", 0, nil)
 }
 
 
 // Return AccessToken datastore key.
 func accessTokenKey(context appengine.Context) *datastore.Key {
-	return datastore.NewKey(context, "AccessTokens", "default_at", 0, nil)
+  return datastore.NewKey(context, "AccessTokens", "default_at", 0, nil)
 }
 
 
 // Return access token for provided email address.
 func getAccessToken(context appengine.Context, email string) string {
-	userAccessToken := datastore.NewQuery("AccessTokens").Ancestor(
-		accessTokenKey(context)).Filter("Email =", email).Limit(1)
-	aTokens := make([]AccessTokens, 0, 1)
-	userAccessToken.GetAll(context, &aTokens)
-	if len(aTokens) > 0 {
-		return aTokens[0].AccessToken
-	}
-	return ""
+  userAccessToken := datastore.NewQuery("AccessTokens").Ancestor(
+    accessTokenKey(context)).Filter("Email =", email).Limit(1)
+  aTokens := make([]AccessTokens, 0, 1)
+  userAccessToken.GetAll(context, &aTokens)
+  if len(aTokens) > 0 {
+    return aTokens[0].AccessToken
+  }
+  return ""
 }
 
 
 // Return access token from provided handler.
 func getAccessTokenFromHandler(
     context appengine.Context, handler string) string {
-	webhook := getWebhookFromHandler(context, handler)
-	if webhook != nil {
-		return getAccessToken(context, webhook.Email)
-	}
-	return ""
+  webhook := getWebhookFromHandler(context, handler)
+  if webhook != nil {
+    return getAccessToken(context, webhook.Email)
+  }
+  return ""
 }
 
 
