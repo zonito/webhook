@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Webhook - Start</title>
+  </head>
+  <body>
+    Redirecting...
+    <form method="post" action="/cb">
+      <input type="hidden" id="val" name="token" />
+      <input type="submit" id="submit" style="display: none" />
+    </form>
+    <script type="text/javascript">
+      document.getElementById('val').value = window.location.hash.split('=')[1];
+      document.getElementById('submit').click();
+    </script>
+  </body>
+</html>

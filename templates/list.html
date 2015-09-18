@@ -1,5 +1,9 @@
 {{define "content"}}
-  {{range .}}
-    <div>{{.Handler}} | {{.BoardName}} > {{.ListName}}</div>
+  {{range .WH}}
+    <div>
+      /hooks/{{.Handler}}
+      <div>BoardID: {{.BoardId}}</div>
+      <div>ListID: {{.ListId}}</div>
+    </div>
   {{end}}
 {{end}}

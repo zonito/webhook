@@ -1,0 +1,12 @@
+name: Webhook
+gitignore: true
+
+modules:
+  github.com/gorilla/mux:
+    repository: https://github.com/gorilla/mux
+  github.com/gorilla/context:
+    repository: https://github.com/gorilla/context
+
+profiles:
+  init:
+    tasks: ['modules']
