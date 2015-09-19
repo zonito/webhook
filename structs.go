@@ -8,10 +8,11 @@ type TrelloPayLoad struct {
 
 // Git structs
 
-type GitUser struct {
+type User struct {
   Name string
   Email string
   Username string
+  Display_name string
 }
 
 type GitRepository struct {
@@ -20,8 +21,8 @@ type GitRepository struct {
   Full_name string
   Url string
   AbsoluteUrl string
-  Owner GitUser
-  Pusher GitUser
+  Owner User
+  Pusher User
 }
 
 type GitCommit struct {
@@ -29,8 +30,8 @@ type GitCommit struct {
   Message string
   Timestamp string
   Url string
-  Author GitUser
-  Committer GitUser
+  Author User
+  Committer User
   Modified []string
 }
 
@@ -50,7 +51,7 @@ type DBApplication struct {
 type DBData struct {
   Email string
   Url string
-  member GitUser
+  member User
   User_Agent string
   Message string
   Sentiment string
@@ -61,4 +62,36 @@ type DBData struct {
 type DBPayload struct {
   Event string
   Data DBData
+}
+
+
+// Bitbucket
+
+type BBRepository struct {
+  Name string
+  Is_private bool
+}
+
+type BBAuthor struct {
+  User User
+  Raw string
+}
+
+type BBCommits struct {
+  Message string
+  Hash string
+  Author BBAuthor
+}
+
+type BBChanges struct {
+  Commits []BBCommits
+}
+
+type BBPush struct {
+  Changes []BBChanges
+}
+
+type BBPayload struct {
+  Repository BBRepository
+  Push BBPush
 }

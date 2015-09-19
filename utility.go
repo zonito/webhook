@@ -3,7 +3,6 @@ package webhook
 import (
   "appengine"
   "appengine/datastore"
-  "net/http"
 )
 
 
