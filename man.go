@@ -67,28 +67,32 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
             decoder, request.Header.Get("X-Github-Event"))
         } else if hookType == "doorbell" {
           event, desc = getDoorbellData(decoder)
+        } else if hookType == "bitbucket" {
+          event, desc = getBitbucketData(decoder)
         }
-        url := "https://api.trello.com/1/lists/" + webhook.ListId +
-          "/cards?key=" + trelloKey + "&token=" +
-          getAccessTokenFromHandler(context, handler)
-        payload := &TrelloPayLoad {
-            Name: event,
-            Desc: string(desc),
+        if event != "" {
+          url := "https://api.trello.com/1/lists/" + webhook.ListId +
+            "/cards?key=" + trelloKey + "&token=" +
+            getAccessTokenFromHandler(context, handler)
+          payload := &TrelloPayLoad {
+              Name: event,
+              Desc: string(desc),
+          }
+          str, _ := json.Marshal(payload)
+          jsonStr := strings.Replace(string(str), "Name", "name", 1)
+          jsonStr = strings.Replace(jsonStr, "Desc", "desc", 1)
+          client := urlfetch.Client(context)
+          resp, err := client.Post(
+              url, "application/json", bytes.NewBuffer([]byte(jsonStr)))
+          if err != nil {
+              http.Error(writer, err.Error(), http.StatusInternalServerError)
+              return
+          }
+          defer resp.Body.Close()
+          context.Infof("response Headers:", resp.Header)
+          body, _ := ioutil.ReadAll(resp.Body)
+          context.Infof("response Body:", string(body))
         }
-        str, _ := json.Marshal(payload)
-        jsonStr := strings.Replace(string(str), "Name", "name", 1)
-        jsonStr = strings.Replace(jsonStr, "Desc", "desc", 1)
-        client := urlfetch.Client(context)
-        resp, err := client.Post(
-            url, "application/json", bytes.NewBuffer([]byte(jsonStr)))
-        if err != nil {
-            http.Error(writer, err.Error(), http.StatusInternalServerError)
-            return
-        }
-        defer resp.Body.Close()
-        context.Infof("response Headers:", resp.Header)
-        body, _ := ioutil.ReadAll(resp.Body)
-        context.Infof("response Body:", string(body))
         fmt.Fprintf(writer, "OK")
     }
 }
