@@ -109,7 +109,7 @@ func connect(writer http.ResponseWriter, request *http.Request) {
 		"https://trello.com/1/OAuthAuthorizeToken" +
 			"?key=" + trelloKey + "&callback_method=fragment&scope=read,write" +
 			"&name=PGWebhook&scope=read,write&expiration=never" +
-			"&return_url=http://192.168.99.100:8081/redirect"
+			"&return_url=https://pgwebhook.appspot.com/redirect"
 	http.Redirect(writer, request, authorizeUrl, http.StatusFound)
 }
 
