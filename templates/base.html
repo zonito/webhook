@@ -34,28 +34,30 @@
           <paper-icon-button icon="exit-to-app" on-tap="moreAction"></paper-icon-button> -->
         </paper-toolbar>
         <div class="content">
+          {{with .AccessToken}}
           <wh-created></wh-created>
+          {{end}}
           <div class="create">
+            {{with .AccessToken}}
             <h2>Create new:</h2>
             <form method="post" action="/save" accept-charset="UTF-8">
               <paper-input label="Your hook handler" name="handler" floatingLabel>
               </paper-input>
-              {{with .AccessToken}}
-                <div>
-                  Board: <select name="board_id" id="boards"></select>
-                  <input type="hidden" name="board_name" />
-                </div>
-                <div>
-                  List: <select name="list_id" id="lists"></select>
-                  <input type="hidden" name="list_name" />
-                </div>
-                <div>
-                  <input type="submit" value="Save" />
-                </div>
-              {{else}}
-                <a href="/connect">Connect to Trello</a>
-              {{end}}
+              <div>
+                Board: <select name="board_id" id="boards"></select>
+                <input type="hidden" name="board_name" />
+              </div>
+              <div>
+                List: <select name="list_id" id="lists"></select>
+                <input type="hidden" name="list_name" />
+              </div>
+              <div>
+                <input type="submit" value="Save" />
+              </div>
             </form>
+            {{else}}
+              <a href="/connect">Connect to Trello</a>
+            {{end}}
           </div>
         </div>
       </paper-header-panel>

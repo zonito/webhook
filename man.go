@@ -58,51 +58,6 @@ func createList(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, string(list))
 }
 
-// Actual webhook handler, receive events and post it to connected services.
-func hooks(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	handler := vars["handler"]
-	context := appengine.NewContext(request)
-	webhook := getWebhookFromHandler(context, handler)
-	if webhook != nil {
-		decoder := json.NewDecoder(request.Body)
-		hookType := getHookType(request)
-		var event, desc string
-		if hookType == "github" {
-			event, desc = getGithubData(
-				decoder, request.Header.Get("X-Github-Event"))
-		} else if hookType == "doorbell" {
-			event, desc = getDoorbellData(decoder)
-		} else if hookType == "bitbucket" {
-			event, desc = getBitbucketData(decoder)
-		}
-		if event != "" {
-			url := "https://api.trello.com/1/lists/" + webhook.ListId +
-				"/cards?key=" + trelloKey + "&token=" +
-				getAccessTokenFromHandler(context, handler)
-			payload := &TrelloPayLoad{
-				Name: event,
-				Desc: string(desc),
-			}
-			str, _ := json.Marshal(payload)
-			jsonStr := strings.Replace(string(str), "Name", "name", 1)
-			jsonStr = strings.Replace(jsonStr, "Desc", "desc", 1)
-			client := urlfetch.Client(context)
-			resp, err := client.Post(
-				url, "application/json", bytes.NewBuffer([]byte(jsonStr)))
-			if err != nil {
-				http.Error(writer, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			defer resp.Body.Close()
-			context.Infof("response Headers:", resp.Header)
-			body, _ := ioutil.ReadAll(resp.Body)
-			context.Infof("response Body:", string(body))
-		}
-		fmt.Fprintf(writer, "OK")
-	}
-}
-
 // Redirect use to get trello service approval.
 func connect(writer http.ResponseWriter, request *http.Request) {
 	authorizeUrl :=
@@ -185,4 +140,49 @@ func save(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	http.Redirect(writer, request, "/", http.StatusFound)
+}
+
+// Actual webhook handler, receive events and post it to connected services.
+func hooks(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	handler := vars["handler"]
+	context := appengine.NewContext(request)
+	webhook := getWebhookFromHandler(context, handler)
+	if webhook != nil {
+		decoder := json.NewDecoder(request.Body)
+		hookType := getHookType(request)
+		var event, desc string
+		if hookType == "github" {
+			event, desc = getGithubData(
+				decoder, request.Header.Get("X-Github-Event"))
+		} else if hookType == "doorbell" {
+			event, desc = getDoorbellData(decoder)
+		} else if hookType == "bitbucket" {
+			event, desc = getBitbucketData(decoder)
+		}
+		if event != "" {
+			url := "https://api.trello.com/1/lists/" + webhook.ListId +
+				"/cards?key=" + trelloKey + "&token=" +
+				getAccessTokenFromHandler(context, handler)
+			payload := &TrelloPayLoad{
+				Name: event,
+				Desc: string(desc),
+			}
+			str, _ := json.Marshal(payload)
+			jsonStr := strings.Replace(string(str), "Name", "name", 1)
+			jsonStr = strings.Replace(jsonStr, "Desc", "desc", 1)
+			client := urlfetch.Client(context)
+			resp, err := client.Post(
+				url, "application/json", bytes.NewBuffer([]byte(jsonStr)))
+			if err != nil {
+				http.Error(writer, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer resp.Body.Close()
+			context.Infof("response Headers:", resp.Header)
+			body, _ := ioutil.ReadAll(resp.Body)
+			context.Infof("response Body:", string(body))
+		}
+		fmt.Fprintf(writer, "OK")
+	}
 }
