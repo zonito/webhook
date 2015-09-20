@@ -2,11 +2,6 @@ indexes:
 - kind: Webhook
   ancestor: yes
   properties:
-  - name: Email
+  - name: User
   - name: Date
-    direction: desc
-- kind: Webhook
-  ancestor: yes
-  properties:
-  - name: Handler
     direction: desc
