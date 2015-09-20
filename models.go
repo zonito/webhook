@@ -1,18 +1,19 @@
 package webhook
 
-import (
-	"time"
-)
+import "time"
 
 type AccessTokens struct {
-  Email string
-  AccessToken string		// Access token of Trello
+	Email       string
+	AccessToken string // Access token of Trello
 }
 
 type Webhook struct {
-  Handler string		// Hook handler to receive events from services.
-  Email string			// Email of user to whom its mapped with.
-  BoardId string		// Board Id of trello
-  ListId string			// List Id of trello
-  Date time.Time		// Created Date
+	Handler   string    `json:"handler"`
+	User      string    `json:"-"`
+	BoardId   string    `json:"board_id"`
+	BoardName string    `json:"board_name"`
+	ListId    string    `json:"list_id"`
+	ListName  string    `json:"list_name"`
+	Date      time.Time `json:"date"`
+	Count     int       `json:"count"`
 }
