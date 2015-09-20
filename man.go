@@ -175,6 +175,7 @@ func save(writer http.ResponseWriter, request *http.Request) {
 		ListId:    request.FormValue("list_id"),
 		ListName:  request.FormValue("list_name"),
 		Date:      time.Now(),
+		Count:     0,
 	}
 	key := datastore.NewIncompleteKey(
 		context, "Webhook", webhookKey(context, request.FormValue("handler")))

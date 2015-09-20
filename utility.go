@@ -32,7 +32,7 @@ func getAccessTokenFromHandler(
 	context appengine.Context, handler string) string {
 	webhook := getWebhookFromHandler(context, handler)
 	if webhook != nil {
-		return getAccessToken(context, "")
+		return getAccessToken(context, webhook.User)
 	}
 	return ""
 }
