@@ -27,16 +27,6 @@ func getAccessToken(context appengine.Context, email string) string {
     return ""
 }
 
-// Return access token from provided handler.
-func getAccessTokenFromHandler(
-    context appengine.Context, handler string) string {
-    webhook := getWebhookFromHandler(context, handler)
-    if webhook != nil {
-        return getAccessToken(context, webhook.User)
-    }
-    return ""
-}
-
 // Return list of webhooks (datastore entities) for given email.
 func getWebhooks(context appengine.Context, email string) []Webhook {
     query := datastore.NewQuery("Webhook").Filter("User =", email).Limit(50)
@@ -51,8 +41,10 @@ func getWebhookFromHandler(
     query := datastore.NewQuery("Webhook").Ancestor(
         webhookKey(context, handler)).Limit(1)
     webhook := make([]Webhook, 0, 1)
-    query.GetAll(context, &webhook)
+    keys, _ := query.GetAll(context, &webhook)
     if len(webhook) > 0 {
+        webhook[0].Count += 1
+        datastore.Put(context, keys[0], &webhook[0])
         return &webhook[0]
     }
     return nil
