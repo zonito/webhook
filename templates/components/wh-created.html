@@ -53,6 +53,9 @@
       paper-button.ripple paper-ripple {
         color: var(--paper-pink-a200);
       }
+      iron-icon {
+        margin-right: 5px;
+      }
     </style>
     <template is="dom-bind" id="createdList">
       <iron-ajax url="/created.json" last-response="{{data}}" auto></iron-ajax>
@@ -60,6 +63,9 @@
         <template>
           <div>
             <div class="item">
+              <paper-button class="ripple blue">
+                <iron-icon icon="trending-up"></iron-icon><span>[[item.count]]</span>
+              </paper-button>
               <!-- <paper-button class="ripple green copy">
                 <iron-icon icon="content-copy"></iron-icon> Copy
               </paper-button> -->
