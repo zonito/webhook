@@ -1,6 +1,6 @@
 # Webhook Manager
 
-Create Webhook URL and response will be store in trello.
+Create Webhook URL and response will be store in trello
 
 ### Webhook supported
 
