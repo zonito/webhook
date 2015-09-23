@@ -64,7 +64,7 @@ func connect(writer http.ResponseWriter, request *http.Request) {
         "https://trello.com/1/OAuthAuthorizeToken" +
             "?key=" + trelloKey + "&callback_method=fragment&scope=read,write" +
             "&name=PGWebhook&scope=read,write&expiration=never" +
-            "&return_url=http://192.168.99.100:8081/redirect"
+            "&return_url=http://webhook.co/redirect"
     http.Redirect(writer, request, authorizeUrl, http.StatusFound)
 }
 
@@ -149,17 +149,7 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
-        decoder := json.NewDecoder(request.Body)
-        hookType := getHookType(request)
-        var event, desc string
-        if hookType == "github" {
-            event, desc = getGithubData(
-                decoder, request.Header.Get("X-Github-Event"))
-        } else if hookType == "doorbell" {
-            event, desc = getDoorbellData(decoder)
-        } else if hookType == "bitbucket" {
-            event, desc = getBitbucketData(decoder)
-        }
+        event, desc := getEventData(request)
         if event != "" {
             url := "https://api.trello.com/1/lists/" + webhook.ListId +
                 "/cards?key=" + trelloKey + "&token=" +
