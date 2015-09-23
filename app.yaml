@@ -1,5 +1,5 @@
 application: pgwebhook
-version: 1
+version: 20150923
 runtime: go
 api_version: go1
 
