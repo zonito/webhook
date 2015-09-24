@@ -1,5 +1,12 @@
 package webhook
 
+// Response
+type Response struct {
+    Success bool   `json:"success"`
+    Reason  string `json:"reason"`
+    Handler string `json:"handler"`
+}
+
 // To send as trello api payload.
 type TrelloPayLoad struct {
     Name string
@@ -129,4 +136,28 @@ type TRPayload struct {
     Pull_request_number string
     Pull_request_type   string
     Tag                 string
+}
+
+// Telegram
+
+type TeleUser struct {
+    Id         int
+    First_name string
+    Last_name  string
+    Username   string
+    Title      string
+}
+
+type TeleMessage struct {
+    Message_id     int
+    Date           int
+    Text           string
+    From           TeleUser
+    Chat           TeleUser
+    New_chat_title string
+}
+
+type TelePayload struct {
+    Update_id int
+    Message   TeleMessage
 }

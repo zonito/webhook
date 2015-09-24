@@ -1,98 +1,104 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html" />
 <link rel="import" href="/bower_components/iron-list/iron-list.html" />
 <link rel="import" href="/bower_components/paper-button/paper-button.html" />
-<link rel="import" href="/bower_components/iron-icon/iron-icon.html" />
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html" />
 
 <dom-module id="wh-created">
-  <template>
-    <style>
-      .pad {
-        @apply(--layout-flex);
-        @apply(--layout-vertical);
-      }
-      iron-list {
-        background-color: var(--paper-grey-200, #eee);
-      }
-      .item {
-        @apply(--layout-horizontal);
-      }
-      .url {
-        font-size: 18px;
-        font-weight: 600;
-      }
-      .info {
-        color: #A9A9A9;
-        font-size: 14px;
-        margin-top: 7px;
-      }
-      paper-button.blue {
-        color: var(--paper-light-blue-500);
-        --paper-button-flat-focus-color: var(--paper-light-blue-50);
-      }
-      paper-button.blue:hover {
-        background: var(--paper-light-blue-50);
-      }
-      paper-button.red {
-        color: var(--paper-red-500);
-        --paper-button-flat-focus-color: var(--paper-red-50);
-      }
-      paper-button.red:hover {
-        background: var(--paper-red-50);
-      }
-      paper-button.green {
-        color: var(--paper-green-500);
-        --paper-button-flat-focus-color: var(--paper-green-50);
-      }
-      paper-button.green:hover {
-        background: var(--paper-green-50);
-      }
-      paper-button.ripple::shadow paper-ripple {
-        color: var(--paper-pink-a200);
-      }
-      paper-button.ripple paper-ripple {
-        color: var(--paper-pink-a200);
-      }
-      iron-icon {
-        margin-right: 5px;
-      }
-    </style>
-    <template is="dom-bind" id="createdList">
-      <iron-ajax url="/created.json" last-response="{{data}}" auto></iron-ajax>
-      <iron-list items="[[data]]" as="item">
-        <template>
-          <div>
-            <div class="item">
-              <paper-button class="ripple blue">
-                <iron-icon icon="trending-up"></iron-icon><span>[[item.count]]</span>
-              </paper-button>
-              <!-- <paper-button class="ripple green copy">
-                <iron-icon icon="content-copy"></iron-icon> Copy
-              </paper-button> -->
-              <div class="pad">
-                <div contenteditable="true" class="url">
-                  http://webhook.co/hooks/<span>[[item.handler]]</span>
-                </div>
-                <div class="info">
-                  Board: <span>[[item.board_name]]</span> >
-                  List: <span>[[item.list_name]]</span>
-                </div>
+  <style>
+    .pad {
+      @apply(--layout-flex);
+      @apply(--layout-vertical);
+    }
+    iron-list {
+      background-color: var(--paper-grey-200, #eee);
+    }
+    .item {
+      @apply(--layout-horizontal);
+    }
+    .url {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .info {
+      color: #A9A9A9;
+      font-size: 14px;
+      margin-top: 7px;
+    }
+    paper-button.blue {
+      color: var(--paper-light-blue-500);
+      --paper-button-flat-focus-color: var(--paper-light-blue-50);
+    }
+    paper-button.blue:hover {
+      background: var(--paper-light-blue-50);
+    }
+    paper-icon-button.red {
+      color: var(--paper-red-500);
+      --paper-button-flat-focus-color: var(--paper-red-50);
+    }
+    paper-icon-button.red:hover {
+      background: var(--paper-red-50);
+    }
+    paper-icon-button.green {
+      color: var(--paper-green-500);
+      --paper-button-flat-focus-color: var(--paper-green-50);
+    }
+    paper-icon-button.green:hover {
+      background: var(--paper-green-50);
+    }
+    paper-icon-button.ripple::shadow paper-ripple {
+      color: var(--paper-pink-a200);
+    }
+    paper-icon-button.ripple paper-ripple {
+      color: var(--paper-pink-a200);
+    }
+  </style>
+  <template is="dom-bind" id="createdList">
+    <iron-ajax url="/created.json" last-response="{{data}}" auto></iron-ajax>
+    <iron-list items="{{data}}" as="item">
+      <template>
+        <div>
+          <div class="item">
+            <paper-button class="ripple blue">
+              <iron-icon icon="trending-up"></iron-icon>&nbsp;<span>{{item.count}}</span>
+            </paper-button>
+            <div class="pad">
+              <div class="url">http://webhook.co/<span>{{item.handler}}</span></div>
+              <div class="info">
+                <span>{{item.type}}</span> >>
+                <template is="dom-if" if="{{isTrello(item)}}">
+                  Board: <span>{{item.board_name}}</span> >
+                  List: <span>{{item.list_name}}</span>
+                </template>
+                <template is="dom-if" if="{{isTelegram(item)}}">
+                  Chat: <span>{{item.tele_name}}</span>
+                </template>
               </div>
-              <!-- <paper-button class="ripple blue">
-                <iron-icon icon="cached"></iron-icon> Test
-              </paper-button>
-              <paper-button class="ripple red">
-                <iron-icon icon="delete"></iron-icon> Delete
-              </paper-button> -->
             </div>
+            <paper-icon-button class="ripple green copy" on-tap="copy" icon="content-copy">
+            </paper-icon-button>
+            <paper-icon-button class="ripple red" icon="delete">
+            </paper-icon-button>
           </div>
-        </template>
-      </iron-list>
-    </template>
+        </div>
+      </template>
+    </iron-list>
   </template>
-  <script>
-    Polymer({
-      is: 'wh-created'
-    });
-  </script>
 </dom-module>
+<script>
+(function(){
+  Polymer({
+    is: 'wh-created',
+    isTrello: function (item) {
+      return item.type === 'Trello';
+    },
+    isTelegram: function (item) {
+      return item.type === 'Telegram';
+    },
+    copy: function (e) {
+      wh.util.clip($('.url', $(e.target).parent().parent()).text().trim());
+    }
+  });
+}());
+</script>

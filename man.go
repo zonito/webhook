@@ -7,7 +7,6 @@ import (
     "appengine/datastore"
     "appengine/urlfetch"
     "appengine/user"
-    "bytes"
     "encoding/json"
     "fmt"
     "github.com/gorilla/mux"
@@ -28,12 +27,13 @@ var redirectTmpl = template.Must(
 func init() {
     route := mux.NewRouter()
     route.HandleFunc("/", root)
-    route.HandleFunc("/created.json", createList)
     route.HandleFunc("/cb", callback)
     route.HandleFunc("/connect", connect)
-    route.HandleFunc("/hooks/{handler}", hooks)
+    route.HandleFunc("/created.json", createList)
+    route.HandleFunc("/w{handler}", hooks)
     route.HandleFunc("/redirect", redirect)
     route.HandleFunc("/save", save)
+    route.HandleFunc("/telegram/{telegramToken}", telegramWebhook)
     route.HandleFunc("/trello/{type}/{boardid}", trelloList)
     http.Handle("/", route)
 }
@@ -42,9 +42,11 @@ func init() {
 func root(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
+    url, _ := user.LogoutURL(context, "/")
     data := struct {
         AccessToken string
-    }{getAccessToken(context, appUser.Email)}
+        Logout      string
+    }{getAccessToken(context, appUser.Email), url}
     if err := listTmpl.Execute(writer, data); err != nil {
         http.Error(writer, err.Error(), http.StatusInternalServerError)
     }
@@ -124,56 +126,103 @@ func trelloList(writer http.ResponseWriter, request *http.Request) {
 func save(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
-    webhook := Webhook{
-        User:      appUser.Email,
-        Handler:   request.FormValue("handler"),
-        BoardId:   request.FormValue("board_id"),
-        BoardName: request.FormValue("board_name"),
-        ListId:    request.FormValue("list_id"),
-        ListName:  request.FormValue("list_name"),
-        Date:      time.Now(),
-        Count:     0,
+    response := Response{
+        Success: true,
+        Reason:  "",
     }
-    key := datastore.NewIncompleteKey(
-        context, "Webhook", webhookKey(context, request.FormValue("handler")))
-    _, err := datastore.Put(context, key, &webhook)
-    if err != nil {
-        http.Error(writer, err.Error(), http.StatusInternalServerError)
+    handler := "w" + getsrand(7)
+    webhook := Webhook{
+        User:    appUser.Email,
+        Handler: handler,
+        Date:    time.Now(),
+        Count:   0,
+    }
+    if request.FormValue("service") == "trello" {
+        webhook.Type = "Trello"
+        webhook.BoardId = request.FormValue("board_id")
+        webhook.BoardName = request.FormValue("board_name")
+        webhook.ListId = request.FormValue("list_id")
+        webhook.ListName = request.FormValue("list_name")
+    } else if request.FormValue("service") == "telegram" {
+        webhook.Type = "Telegram"
+        webhook.TeleChatId, webhook.TeleChatName = getChatIdFromCode(
+            context, request.FormValue("tele_code"))
+        if webhook.TeleChatId == 0 {
+            response.Success = false
+            response.Reason = "Invalid code."
+        } else {
+            sendTeleMessage(
+                context, "You are connected!", webhook.TeleChatId)
+        }
+    }
+    if response.Success {
+        key := datastore.NewIncompleteKey(
+            context, "Webhook", webhookKey(context, handler))
+        _, err := datastore.Put(context, key, &webhook)
+        if err != nil {
+            http.Error(writer, err.Error(), http.StatusInternalServerError)
+            return
+        }
+        response.Handler = handler
+    }
+    writer.Header().Set("Content-Type", "application/json")
+    resp, _ := json.Marshal(response)
+    fmt.Fprintf(writer, string(resp))
+}
+
+// Telegram webhook
+func telegramWebhook(writer http.ResponseWriter, request *http.Request) {
+    vars := mux.Vars(request)
+    if vars["telegramToken"] != teleToken {
+        fmt.Fprintf(writer, "NOT OK")
         return
     }
-    http.Redirect(writer, request, "/", http.StatusFound)
+    context := appengine.NewContext(request)
+    decoder := json.NewDecoder(request.Body)
+    var teleEvent TelePayload
+    decoder.Decode(&teleEvent)
+    message := teleEvent.Message
+    if strings.Index(message.Text, "/getcode") > -1 {
+        code := getsrand(6)
+        teleVerify := TeleVerify{
+            ChatId: message.Chat.Id,
+            Code:   code,
+            Date:   time.Now(),
+            Name:   message.Chat.First_name,
+        }
+        if message.Chat.Id < 0 {
+            teleVerify.Name = message.Chat.Title
+        }
+        key := datastore.NewIncompleteKey(
+            context, "TeleVerify", teleVerifyKey(context, code))
+        datastore.Put(context, key, &teleVerify)
+        sendTeleMessage(context, code, message.Chat.Id)
+    } else if strings.Index(message.Text, "/start") > -1 {
+        sendTeleMessage(
+            context, "Welcome! Next step is to get registered with webhook.co",
+            message.Chat.Id)
+    } else if strings.Index(message.Text, "/help") > -1 {
+        sendTeleMessage(
+            context, "Get registered with webhook.co", message.Chat.Id)
+    }
+    fmt.Fprintf(writer, "OK")
 }
 
 // Actual webhook handler, receive events and post it to connected services.
 func hooks(writer http.ResponseWriter, request *http.Request) {
     vars := mux.Vars(request)
-    handler := vars["handler"]
+    handler := "w" + vars["handler"]
     context := appengine.NewContext(request)
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
         event, desc := getEventData(request)
         if event != "" {
-            url := "https://api.trello.com/1/lists/" + webhook.ListId +
-                "/cards?key=" + trelloKey + "&token=" +
-                getAccessToken(context, webhook.User)
-            payload := &TrelloPayLoad{
-                Name: event,
-                Desc: string(desc),
+            if webhook.Type == "Trello" {
+                pushToTrello(context, webhook, event, desc)
+            } else if webhook.Type == "Telegram" {
+                sendTeleMessage(
+                    context, event+"\n\n"+desc, webhook.TeleChatId)
             }
-            str, _ := json.Marshal(payload)
-            jsonStr := strings.Replace(string(str), "Name", "name", 1)
-            jsonStr = strings.Replace(jsonStr, "Desc", "desc", 1)
-            client := urlfetch.Client(context)
-            resp, err := client.Post(
-                url, "application/json", bytes.NewBuffer([]byte(jsonStr)))
-            if err != nil {
-                http.Error(writer, err.Error(), http.StatusInternalServerError)
-                return
-            }
-            defer resp.Body.Close()
-            context.Infof("response Headers:", resp.Header)
-            body, _ := ioutil.ReadAll(resp.Body)
-            context.Infof("response Body:", string(body))
         }
         fmt.Fprintf(writer, "OK")
     }

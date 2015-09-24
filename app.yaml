@@ -1,16 +1,19 @@
 application: pgwebhook
-version: 20150923
+version: 20150924
 runtime: go
 api_version: go1
 
 handlers:
 - url: /bower_components
   static_dir: bower_components
+  expiration: 1d
 - url: /components
   static_dir: templates/components
 - url: /static
   static_dir: static
-- url: /hooks/.*
+- url: /w.*
+  script: _go_app
+- url: /telegram/.*
   script: _go_app
 - url: /.*
   script: _go_app
