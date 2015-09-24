@@ -17,7 +17,7 @@
 ## Connected Services
 
 * Trello
-* Telegram (@HeyJarvis)
+* Telegram (@WebhookCo)
 * Pushover (Under Construction)
 * Pushbullet (Yet to start)
 * Evernote (Yet to start)
