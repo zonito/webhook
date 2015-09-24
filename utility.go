@@ -3,6 +3,15 @@ package webhook
 import (
     "appengine"
     "appengine/datastore"
+    "appengine/urlfetch"
+    "bytes"
+    "encoding/json"
+    "io/ioutil"
+    "math/rand"
+    "net/url"
+    "strconv"
+    "strings"
+    "time"
 )
 
 // Return webhook datastore key.
@@ -13,6 +22,11 @@ func webhookKey(context appengine.Context, handler string) *datastore.Key {
 // Return AccessToken datastore key.
 func accessTokenKey(context appengine.Context, email string) *datastore.Key {
     return datastore.NewKey(context, "AccessTokens", email, 0, nil)
+}
+
+// Return TeleVerify datastore key.
+func teleVerifyKey(context appengine.Context, code string) *datastore.Key {
+    return datastore.NewKey(context, "TeleVerify", code, 0, nil)
 }
 
 // Return access token for provided email address.
@@ -49,3 +63,19 @@ func getWebhookFromHandler(
     }
     return nil
 }
+
+// Return Chat id from Code
+func getChatIdFromCode(context appengine.Context, code string) (int, string) {
+    query := datastore.NewQuery("TeleVerify").Ancestor(
+        teleVerifyKey(context, code)).Limit(1)
+    teleVerify := make([]TeleVerify, 0, 1)
+    keys, _ := query.GetAll(context, &teleVerify)
+    if len(teleVerify) > 0 {
+        chatId, name := teleVerify[0].ChatId, teleVerify[0].Name
+        datastore.Delete(context, keys[0])
+        return chatId, name
+    }
+    return 0, ""
+}
+
+// Return random alphanumeric string

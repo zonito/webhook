@@ -11,11 +11,13 @@
     </script>
     <script src="/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
     <link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
-    <link rel="import" href="/bower_components/paper-styles/paper-styles.html" />
-    <link rel="import" href="/bower_components/paper-input/paper-input.html" />
-    <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html" />
-    <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
+    <link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
     <link rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html" />
+    <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html" />
+    <link rel="import" href="/bower_components/paper-input/paper-input.html" />
+    <link rel="import" href="/bower_components/paper-styles/paper-styles.html" />
+    <link rel="import" href="/bower_components/paper-toast/paper-toast.html" />
+    <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
     <link rel="import" href="/components/wh-created.html" />
     <style is="custom-style">
       .header {
@@ -26,41 +28,63 @@
   <body unresolved>
     <div class="base">
       <paper-header-panel class="header">
-        <!-- <div class="paper-header">Webhook Manager</div> -->
         <paper-toolbar>
           <!-- <paper-icon-button icon="menu" on-tap="menuAction"></paper-icon-button> -->
-          <div class="title">Webhook Manager</div>
-          <!-- <paper-icon-button icon="add" on-tap="moreAction"></paper-icon-button>
-          <paper-icon-button icon="exit-to-app" on-tap="moreAction"></paper-icon-button> -->
+          <div class="title">webhook.co</div>
+          <paper-icon-button icon="add" id="addHook"></paper-icon-button>
+          <a href="{{ .Logout }}">
+            <paper-icon-button icon="exit-to-app" on-tap="moreAction">
+            </paper-icon-button>
+          </a>
         </paper-toolbar>
         <div class="content">
           {{with .AccessToken}}
           <wh-created></wh-created>
           {{end}}
-          <div class="create">
-            {{with .AccessToken}}
-            <h2>Create new:</h2>
-            <form method="post" action="/save" accept-charset="UTF-8">
-              <paper-input label="Your hook handler" name="handler" floatingLabel>
-              </paper-input>
-              <div>
-                Board: <select name="board_id" id="boards"></select>
-                <input type="hidden" name="board_name" />
+          <paper-dialog id="modal" modal>
+            <div class="create">
+              <h2>Select service to connect</h2>
+              <div class="apps">
+                <div class="app">
+                  <img src="//storage.googleapis.com/pgwebhook/trello.png" alt="trello" />
+                </div>
+                <div class="app">
+                  <img src="//storage.googleapis.com/pgwebhook/telegram.png" alt="telegram" />
+                </div>
               </div>
-              <div>
-                List: <select name="list_id" id="lists"></select>
-                <input type="hidden" name="list_name" />
+              <div class="conf">
+                <div class="hide trello fields">
+                {{with .AccessToken}}
+                  <h2 class="margin">Trello</h2>
+                  <div>
+                    Board: <select id="boards"></select>
+                    <input type="hidden" id="board_name" />
+                  </div>
+                  <div class="list hide">
+                    List: <select id="lists"></select>
+                    <input type="hidden" id="list_name" />
+                  </div>
+                {{else}}
+                  <a href="/connect">Connect to Trello</a>
+                {{end}}
+                </div>
+                <div class="hide telegram">
+                  <h2>Telegram</h2>
+                  <paper-input label="Code" floatingLabel id="tele_code" maxlength="6"></paper-input>
+                  <div>
+                    Add <span>@HeyJarvis</span> in Telegram, and generated code using <span>/getcode</span> command
+                  </div>
+                </div>
               </div>
-              <div>
-                <input type="submit" value="Create webhook" />
-              </div>
-            </form>
-            {{else}}
-              <a href="/connect">Connect to Trello</a>
-            {{end}}
-          </div>
+            </div>
+            <div class="error"></div>
+            <div class="buttons">
+              <paper-button autofocus raised class="colorful hide" id="create">Create Hook</paper-button>
+            </div>
+          </paper-dialog>
         </div>
       </paper-header-panel>
+      <paper-toast id="toast"></paper-toast>
     </div>
     {{with .AccessToken}}
     <script src="/static/js/common.js"></script>
