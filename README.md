@@ -2,15 +2,46 @@
 
 # webhook.co
 
-Create webhook url, plug it to your utilities and collect all information at one place.
+**Problem**: Webhook is everywhere, but we still need to implement endpoints in applications to stream line development updates.
 
-### Webhook supported
+**Solution**: Webhook.co is the solution, where you just generate short webhook url and add it to your favorite development tool and choose other side where do you want to receive updates.
+
+## Webhook supported
 
 * Github (Only Push)
 * Bitbucket (Only Push)
 * Doorbell
 * Travis
+* Anymore? Please contribute
 
 ## Connected Services
 
 * Trello
+* Telegram (@HeyJarvis)
+* Pushover (Under Construction)
+* Pushbullet (Yet to start)
+* Evernote (Yet to start)
+* JIRA (Yet to start)
+* Anymore? Please contribute
+
+## Demo
+
+* [webhook.co] (http://webhook.co)
+
+## Deploy to your Google App Engine
+
+* Clone it `git clone`.
+* Update `constants.go` with respective details.
+* Deploy to your GAE application (Make sure you update `app.yaml`).
+
+## Contributing
+
+We <3 issue submissions, and address your problem as quickly as possible!
+
+If you want to write code:
+
+* Fork the repository
+* Create your feature branch (`git checkout -b my-new-feature`)
+* Commit your changes (`git commit -am 'add some feature'`)
+* Push to your branch (`git push origin my-new-feature`)
+* Create a new Pull Request
