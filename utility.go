@@ -79,3 +79,56 @@ func getChatIdFromCode(context appengine.Context, code string) (int, string) {
 }
 
 // Return random alphanumeric string
+func getsrand(n int) string {
+    var src = rand.NewSource(time.Now().UnixNano())
+    b := make([]byte, n)
+    // A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
+    for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+        if remain == 0 {
+            cache, remain = src.Int63(), letterIdxMax
+        }
+        if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+            b[i] = letterBytes[idx]
+            i--
+        }
+        cache >>= letterIdxBits
+        remain--
+    }
+    return string(b)
+}
+
+// Send telegram message
+func sendTeleMessage(context appengine.Context, text string, chat_id int) {
+    var Url *url.URL
+    Url, _ = url.Parse(apiUrl)
+    parameters := url.Values{}
+    parameters.Add("parse_mode", "Markdown")
+    parameters.Add("chat_id", strconv.Itoa(chat_id))
+    parameters.Add("text", text)
+    Url.RawQuery = parameters.Encode()
+    client := urlfetch.Client(context)
+    resp, _ := client.Get(Url.String())
+    defer resp.Body.Close()
+}
+
+// Push to Trello
+func pushToTrello(
+    context appengine.Context, webhook *Webhook, event string, desc string) {
+    url := "https://api.trello.com/1/lists/" + webhook.ListId +
+        "/cards?key=" + trelloKey + "&token=" +
+        getAccessToken(context, webhook.User)
+    payload := &TrelloPayLoad{
+        Name: event,
+        Desc: string(desc),
+    }
+    str, _ := json.Marshal(payload)
+    jsonStr := strings.Replace(string(str), "Name", "name", 1)
+    jsonStr = strings.Replace(jsonStr, "Desc", "desc", 1)
+    client := urlfetch.Client(context)
+    resp, _ := client.Post(
+        url, "application/json", bytes.NewBuffer([]byte(jsonStr)))
+    defer resp.Body.Close()
+    context.Infof("response Headers:", resp.Header)
+    body, _ := ioutil.ReadAll(resp.Body)
+    context.Infof("response Body:", string(body))
+}
