@@ -1,17 +1,19 @@
 body {
   background-color: #eee;
 }
-.base {
-  height: 100vh;
+paper-toolbar a {
+  color: #FFF;
+  text-decoration: none;
 }
-.header > .content {
-  background: #eee;
+paper-button.colorful {
+  color: #4285f4;
 }
-form > div {
-  margin: 15px;
+paper-button[raised].colorful {
+  background: #4285f4;
+  color: #fff;
 }
-.pad {
-  padding: 0 16px;
+paper-button[toggles][active][raised].colorful {
+  background-color: rgba(66, 133, 244, 0.75);
 }
 wh-created iron-list {
   padding-bottom: 16px;
@@ -24,11 +26,53 @@ wh-created .item {
   margin: 20px 20px 0 20px;
   padding: 20px;
 }
-.create {
-  background-color: #FFF;
-  border-radius: 3px;
-  border: 1px solid #D8D8D8;
-  margin: 0 20px;
-  padding: 25px;
-  box-shadow: 0 1px 2px 0 rgba(0,0,0,.16);
+paper-dialog .pad {
+  padding: 20px;
+}
+.base {
+  height: 100vh;
+}
+.header > .content {
+  background: #eee;
+}
+.pad {
+  padding: 0 16px;
+}
+.telegram span {
+  color: #2481CC;
+}
+.apps {
+  margin: 20px 0;
+}
+.apps .app {
+  display: inline;
+  margin: 5px;
+}
+.app img {
+  -webkit-filter: grayscale(100%);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  filter: grayscale(100%);
+  padding: 5px;
+}
+.app img:hover, .app img.selected {
+  -webkit-filter: grayscale(0%);
+  filter: grayscale(0%);
+}
+.hide {
+  display: none;
+}
+.conf h2.margin {
+  margin-bottom: 15px;
+}
+.fields div {
+  margin: 15px;
+}
+.fields div select {
+  font-size: 20px;
+  margin: 0 10px;
+}
+.error {
+  color: #f44336;
+  float: left;
 }

@@ -8,12 +8,22 @@ type AccessTokens struct {
 }
 
 type Webhook struct {
-    Handler   string    `json:"handler"`
-    User      string    `json:"-"`
-    BoardId   string    `json:"board_id"`
-    BoardName string    `json:"board_name"`
-    ListId    string    `json:"list_id"`
-    ListName  string    `json:"list_name"`
-    Date      time.Time `json:"date"`
-    Count     int       `json:"count"`
+    Handler      string    `json:"handler"`
+    User         string    `json:"-"`
+    Type         string    `json:"type"`
+    BoardId      string    `json:"board_id"`
+    BoardName    string    `json:"board_name"`
+    ListId       string    `json:"list_id"`
+    ListName     string    `json:"list_name"`
+    TeleChatId   int       `json:"tele_chat_id"`
+    TeleChatName string    `json:"tele_name"`
+    Date         time.Time `json:"date"`
+    Count        int       `json:"count"`
+}
+
+type TeleVerify struct {
+    ChatId int
+    Code   string
+    Date   time.Time
+    Name   string
 }

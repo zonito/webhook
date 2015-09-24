@@ -3,6 +3,7 @@ package webhook
 import (
     "encoding/json"
     "net/http"
+    "strconv"
     "strings"
 )
 
@@ -14,8 +15,34 @@ func getHookType(request *http.Request) string {
         return "doorbell"
     } else if strings.Index(request.Header.Get("User-Agent"), "Bitbucket") > -1 {
         return "bitbucket"
+    } else if request.Header.Get("Travis-Repo-Slug") != "" {
+        return "travis"
     }
     return ""
+}
+
+// Return event type and description to post.
+func getEventData(request *http.Request) (string, string) {
+    hookType := getHookType(request)
+    var decoder *json.Decoder
+    if hookType != "travis" {
+        decoder = json.NewDecoder(request.Body)
+    } else {
+        payload := request.FormValue("payload")
+        decoder = json.NewDecoder(strings.NewReader(payload))
+    }
+    switch hookType {
+    case "github":
+        return getGithubData(
+            decoder, request.Header.Get("X-Github-Event"))
+    case "doorbell":
+        return getDoorbellData(decoder)
+    case "bitbucket":
+        return getBitbucketData(decoder)
+    case "travis":
+        return getTravisData(decoder)
+    }
+    return "", ""
 }
 
 // Prepare and return description for service.
@@ -75,6 +102,26 @@ func getBitbucketData(decoder *json.Decoder) (string, string) {
                     "\n * " + change.Commits[i].Author.Raw
             }
         }
+        return event, desc
+    }
+    return "", ""
+}
+
+// Return travis data.
+func getTravisData(decoder *json.Decoder) (string, string) {
+    var tEvent TRPayload
+    decoder.Decode(&tEvent)
+    if tEvent.Id > 0 {
+        event := "Travis: " + tEvent.Status_message + " for " +
+            tEvent.Repository.Name
+        desc := "**Status**: " + tEvent.Status_message +
+            "\n **Duration**: " + strconv.Itoa(tEvent.Duration) +
+            "\n **Message**: " + tEvent.Message +
+            "\n **Build Number**: " + tEvent.Number +
+            "\n **Type**: " + tEvent.Type +
+            "\n **Compare URL**: " + tEvent.Compare_url +
+            "\n **Committer Name**: " + tEvent.Committer_name +
+            "\n **Build Url**: " + tEvent.Build_url
         return event, desc
     }
     return "", ""
