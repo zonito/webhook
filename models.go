@@ -1,3 +1,5 @@
+// Datastore models.
+
 package webhook
 
 import "time"
@@ -19,11 +21,4 @@ type Webhook struct {
     TeleChatName string    `json:"tele_name"`
     Date         time.Time `json:"date"`
     Count        int       `json:"count"`
-}
-
-type TeleVerify struct {
-    ChatId int
-    Code   string
-    Date   time.Time
-    Name   string
 }
