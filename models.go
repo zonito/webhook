@@ -1,3 +1,5 @@
+// Datastore models.
+
 package webhook
 
 import "time"
