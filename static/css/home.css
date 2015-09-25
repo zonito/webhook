@@ -1,0 +1,82 @@
+body {
+  background-color: #F7F8FA;
+}
+a {
+  color: #3f51b5;
+  text-decoration: none;
+}
+paper-toolbar a {
+  color: white;
+}
+paper-card {
+  margin: 20px;
+}
+.card-actions {
+  padding: 15px !important;
+  text-align: right;
+}
+paper-material.paper-material-0[elevation="1"] {
+    box-shadow: 1px 0px 3px 0px rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 2px 1px -2px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+paper-material .header {
+  border-bottom: 2px solid #B6BCE0;
+}
+.paper-card-0 .header.paper-card .title-text.paper-card {
+    color: #666;
+}
+paper-card.paper-card-0 .card-content {
+    color: #555;
+}
+.content-icon {
+  margin-right: 20px;
+}
+.list .avatar {
+  background-size: 100%;
+  height: 56px;
+  width: 56px;
+}
+.list .github {
+  background-image: url("https://storage.googleapis.com/pgwebhook/octocat.png");
+}
+.list .bitbucket {
+  background-image: url("https://storage.googleapis.com/pgwebhook/bitbucket.png");
+}
+.list .doorbell {
+  background-image: url("https://storage.googleapis.com/pgwebhook/doorbell.png");
+}
+.list .travis {
+  background-image: url("https://storage.googleapis.com/pgwebhook/travis.png");
+}
+.list .trello {
+  background-image: url("https://storage.googleapis.com/pgwebhook/trello.png");
+}
+.list .telegram {
+  background-image: url("https://storage.googleapis.com/pgwebhook/telegram.png");
+}
+.list .pushover {
+  background-image: url("https://storage.googleapis.com/pgwebhook/pushover.png");
+}
+.logo {
+  background-image: url("https://storage.googleapis.com/pgwebhook/WebHook.png");
+  background-position-y: 30px;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  height: 130px;
+  margin: 20px auto;
+  text-align: center;
+  width: 100px;
+}
+#drawer.paper-drawer-panel > [drawer] {
+  background-color: #F7F8FA;
+  box-shadow: -2px 170px 2px 0px rgba(138, 138, 138, 0.18) inset;
+}
+paper-menu paper-item {
+  cursor: pointer;
+  position: relative;
+}
+paper-menu {
+  background-color: rgba(0, 0, 0, 0) !important;
+}
