@@ -42,8 +42,9 @@ paper-dialog .pad {
 .pad {
   padding: 0 16px;
 }
-.telegram span {
-  color: #2481CC;
+.telegram a, .pushover a {
+    color: #2481CC;
+    text-decoration: none;
 }
 .apps {
   margin: 20px 0;

@@ -15,8 +15,6 @@ import (
     "time"
 )
 
-var listTmpl = template.Must(
-    template.ParseFiles("templates/base.html", "templates/list.html"))
 var redirectTmpl = template.Must(
     template.ParseFiles("templates/callback.html"))
 
@@ -25,6 +23,7 @@ var redirectTmpl = template.Must(
 func init() {
     route := mux.NewRouter()
     route.HandleFunc("/", root)
+    route.HandleFunc("/login", login)
     route.HandleFunc("/cb", callback)
     route.HandleFunc("/connect", connect)
     route.HandleFunc("/created.json", createdJson)
@@ -46,17 +45,29 @@ func createdJson(writer http.ResponseWriter, request *http.Request) {
     fmt.Fprintf(writer, string(list))
 }
 
+// Redirect use to get trello service approval. (/connect)
+func login(writer http.ResponseWriter, request *http.Request) {
+    http.Redirect(writer, request, "/", http.StatusFound)
+}
+
 // Root handler (/), show for to create new and list of created hooks.
 func root(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
-    url, _ := user.LogoutURL(context, "/")
-    data := struct {
-        AccessToken string
-        Logout      string
-    }{getAccessToken(context, appUser.Email), url}
-    if err := listTmpl.Execute(writer, data); err != nil {
-        http.Error(writer, err.Error(), http.StatusInternalServerError)
+    if appUser != nil {
+        listTmpl := template.Must(
+            template.ParseFiles("templates/base.html", "templates/list.html"))
+        url, _ := user.LogoutURL(context, "/")
+        data := struct {
+            AccessToken string
+            Logout      string
+        }{getAccessToken(context, appUser.Email), url}
+        if err := listTmpl.Execute(writer, data); err != nil {
+            http.Error(writer, err.Error(), http.StatusInternalServerError)
+        }
+    } else {
+        homeTmpl := template.Must(template.ParseFiles("templates/index.html"))
+        homeTmpl.Execute(writer, nil)
     }
 }
 
@@ -142,6 +153,15 @@ func save(writer http.ResponseWriter, request *http.Request) {
             services.SendTeleMessage(
                 context, "You are connected!", webhook.TeleChatId)
         }
+    } else if request.FormValue("service") == "pushover" {
+        webhook.Type = "Pushover"
+        webhook.POUserKey = request.FormValue("po_userkey")
+        status := services.SendPushoverMessage(
+            context, "You are connected!", webhook.POUserKey)
+        if status == 0 {
+            response.Success = false
+            response.Reason = "Invalid key."
+        }
     }
     if response.Success {
         key := datastore.NewIncompleteKey(
@@ -175,6 +195,7 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
         event, desc := services.GetEventData(request)
+        context.Infof("%s: %s", webhook.Type, event)
         if event != "" {
             if webhook.Type == "Trello" {
                 services.PushToTrello(
@@ -183,6 +204,9 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
             } else if webhook.Type == "Telegram" {
                 services.SendTeleMessage(
                     context, event+"\n"+desc, webhook.TeleChatId)
+            } else if webhook.Type == "Pushover" {
+                services.SendPushoverMessage(
+                    context, event+"\n"+desc, webhook.POUserKey)
             }
         }
         fmt.Fprintf(writer, "OK")
