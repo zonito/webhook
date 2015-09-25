@@ -1,28 +1,43 @@
-package webhook
+package services
 
 import (
+    "appengine"
+    "appengine/urlfetch"
     "encoding/json"
+    "io/ioutil"
+    "math/rand"
     "net/http"
     "strconv"
     "strings"
+    "time"
 )
 
-// Return type of hook.
-func getHookType(request *http.Request) string {
-    if request.Header.Get("X-Github-Event") != "" {
-        return "github"
-    } else if request.Header.Get("X-Sender") == "Doorbell" {
-        return "doorbell"
-    } else if strings.Index(request.Header.Get("User-Agent"), "Bitbucket") > -1 {
-        return "bitbucket"
-    } else if request.Header.Get("Travis-Repo-Slug") != "" {
-        return "travis"
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const (
+    letterIdxBits = 6                    // 6 bits to represent a letter index
+    letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+    letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+)
+
+// Return url response
+func getResponse(context appengine.Context, url string) string {
+    client := urlfetch.Client(context)
+    resp, err := client.Get(url)
+    if err != nil {
+        context.Infof("GetBoards client.Get: %v", err.Error())
+        return ""
     }
-    return ""
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        context.Infof("GetBoards ioutil.ReadAll: %v", err.Error())
+        return ""
+    }
+    return string(body)
 }
 
 // Return event type and description to post.
-func getEventData(request *http.Request) (string, string) {
+func GetEventData(request *http.Request) (string, string) {
     hookType := getHookType(request)
     var decoder *json.Decoder
     if hookType != "travis" {
@@ -43,6 +58,20 @@ func getEventData(request *http.Request) (string, string) {
         return getTravisData(decoder)
     }
     return "", ""
+}
+
+// Return type of hook.
+func getHookType(request *http.Request) string {
+    if request.Header.Get("X-Github-Event") != "" {
+        return "github"
+    } else if request.Header.Get("X-Sender") == "Doorbell" {
+        return "doorbell"
+    } else if strings.Index(request.Header.Get("User-Agent"), "Bitbucket") > -1 {
+        return "bitbucket"
+    } else if request.Header.Get("Travis-Repo-Slug") != "" {
+        return "travis"
+    }
+    return ""
 }
 
 // Prepare and return description for service.
@@ -125,4 +154,23 @@ func getTravisData(decoder *json.Decoder) (string, string) {
         return event, desc
     }
     return "", ""
+}
+
+// Return random alphanumeric string
+func GetAlphaNumberic(n int) string {
+    var src = rand.NewSource(time.Now().UnixNano())
+    b := make([]byte, n)
+    // A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
+    for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+        if remain == 0 {
+            cache, remain = src.Int63(), letterIdxMax
+        }
+        if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+            b[i] = letterBytes[idx]
+            i--
+        }
+        cache >>= letterIdxBits
+        remain--
+    }
+    return string(b)
 }

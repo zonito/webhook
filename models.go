@@ -20,10 +20,3 @@ type Webhook struct {
     Date         time.Time `json:"date"`
     Count        int       `json:"count"`
 }
-
-type TeleVerify struct {
-    ChatId int
-    Code   string
-    Date   time.Time
-    Name   string
-}
