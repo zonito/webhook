@@ -15,8 +15,6 @@ import (
     "time"
 )
 
-var listTmpl = template.Must(
-    template.ParseFiles("templates/base.html", "templates/list.html"))
 var redirectTmpl = template.Must(
     template.ParseFiles("templates/callback.html"))
 
@@ -25,6 +23,7 @@ var redirectTmpl = template.Must(
 func init() {
     route := mux.NewRouter()
     route.HandleFunc("/", root)
+    route.HandleFunc("/login", login)
     route.HandleFunc("/cb", callback)
     route.HandleFunc("/connect", connect)
     route.HandleFunc("/created.json", createdJson)
@@ -46,17 +45,29 @@ func createdJson(writer http.ResponseWriter, request *http.Request) {
     fmt.Fprintf(writer, string(list))
 }
 
+// Redirect use to get trello service approval. (/connect)
+func login(writer http.ResponseWriter, request *http.Request) {
+    http.Redirect(writer, request, "/", http.StatusFound)
+}
+
 // Root handler (/), show for to create new and list of created hooks.
 func root(writer http.ResponseWriter, request *http.Request) {
     context := appengine.NewContext(request)
     appUser := user.Current(context)
-    url, _ := user.LogoutURL(context, "/")
-    data := struct {
-        AccessToken string
-        Logout      string
-    }{getAccessToken(context, appUser.Email), url}
-    if err := listTmpl.Execute(writer, data); err != nil {
-        http.Error(writer, err.Error(), http.StatusInternalServerError)
+    if appUser != nil {
+        listTmpl := template.Must(
+            template.ParseFiles("templates/base.html", "templates/list.html"))
+        url, _ := user.LogoutURL(context, "/")
+        data := struct {
+            AccessToken string
+            Logout      string
+        }{getAccessToken(context, appUser.Email), url}
+        if err := listTmpl.Execute(writer, data); err != nil {
+            http.Error(writer, err.Error(), http.StatusInternalServerError)
+        }
+    } else {
+        homeTmpl := template.Must(template.ParseFiles("templates/index.html"))
+        homeTmpl.Execute(writer, nil)
     }
 }
 

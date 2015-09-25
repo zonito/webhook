@@ -1,5 +1,5 @@
 application: pgwebhook
-version: 20150924
+version: 20150925
 runtime: go
 api_version: go1
 
@@ -11,6 +11,8 @@ handlers:
   static_dir: templates/components
 - url: /static
   static_dir: static
+- url: /
+  script: _go_app
 - url: /w.*
   script: _go_app
 - url: /telegram/.*
