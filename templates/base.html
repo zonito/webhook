@@ -42,9 +42,7 @@
           </a>
         </paper-toolbar>
         <div class="content">
-          {{with .AccessToken}}
           <wh-created></wh-created>
-          {{end}}
           <paper-dialog id="modal">
             <div class="create">
               <h2>Select service to connect</h2>
@@ -54,6 +52,9 @@
                 </div>
                 <div class="app">
                   <img src="//storage.googleapis.com/pgwebhook/telegram.png" alt="telegram" />
+                </div>
+                <div class="app">
+                  <img src="//storage.googleapis.com/pgwebhook/pushover.png" alt="pushover" />
                 </div>
               </div>
               <div class="conf">
@@ -79,6 +80,13 @@
                     Add <span><a href="https://telegram.me/WebhookCoBot" target="_blank">@WebhookCo</a></span> in Telegram, and generated code using <span>/getcode</span> command
                   </div>
                 </div>
+                <div class="hide pushover">
+                  <h2>Pushover</h2>
+                  <paper-input label="Your user key" floatingLabel id="po_userkey"></paper-input>
+                  <div>
+                    Copy your user key from <span><a href="https://pushover.net/" target="_blank">Pushover</a></span> and paste it here.
+                  </div>
+                </div>
               </div>
             </div>
             <div class="error"></div>
@@ -91,8 +99,6 @@
       </paper-header-panel>
       <paper-toast id="toast"></paper-toast>
     </div>
-    {{with .AccessToken}}
     <script src="/static/js/common.js"></script>
-    {{end}}
   </body>
 </html>

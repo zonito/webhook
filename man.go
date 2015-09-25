@@ -142,6 +142,15 @@ func save(writer http.ResponseWriter, request *http.Request) {
             services.SendTeleMessage(
                 context, "You are connected!", webhook.TeleChatId)
         }
+    } else if request.FormValue("service") == "pushover" {
+        webhook.Type = "Pushover"
+        webhook.POUserKey = request.FormValue("po_userkey")
+        status := services.SendPushoverMessage(
+            context, "You are connected!", webhook.POUserKey)
+        if status == 0 {
+            response.Success = false
+            response.Reason = "Invalid key."
+        }
     }
     if response.Success {
         key := datastore.NewIncompleteKey(
@@ -175,6 +184,7 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
         event, desc := services.GetEventData(request)
+        context.Infof("%s: %s", webhook.Type, event)
         if event != "" {
             if webhook.Type == "Trello" {
                 services.PushToTrello(
@@ -183,6 +193,9 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
             } else if webhook.Type == "Telegram" {
                 services.SendTeleMessage(
                     context, event+"\n"+desc, webhook.TeleChatId)
+            } else if webhook.Type == "Pushover" {
+                services.SendPushoverMessage(
+                    context, event+"\n"+desc, webhook.POUserKey)
             }
         }
         fmt.Fprintf(writer, "OK")

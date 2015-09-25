@@ -86,7 +86,7 @@
           wh.ajax.request.list(value);
         },
         lists: function () {
-          $('[name="list_name"]').val($("option:selected", this).text());
+          $('#list_name').val($("option:selected", this).text());
         },
         openCreateDialog: function () {
           $('#modal')[0].toggle();
@@ -125,6 +125,11 @@
             if (data.tele_code.length !== 6) {
               $('.error').text('Invalid code.');
               return;
+            }
+          } else if (service === 'pushover') {
+            data.po_userkey = $('#po_userkey').val();
+            if (data.po_userkey.length < 24) {
+              $('.error').text('Invalid key.');
             }
           }
           wh.ajax.request.createHook(data);
