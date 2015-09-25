@@ -18,10 +18,8 @@
 
 * Trello
 * Telegram (@WebhookCo)
-* Pushover (Under Construction)
+* Pushover
 * Pushbullet (Yet to start)
-* Evernote (Yet to start)
-* JIRA (Yet to start)
 * Anymore? Please contribute
 
 ## Demo
