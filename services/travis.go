@@ -1,5 +1,10 @@
 package services
 
+import (
+    "encoding/json"
+    "strconv"
+)
+
 // Travis
 
 type TRRepository struct {
@@ -34,4 +39,24 @@ type TRPayload struct {
     Pull_request_number string
     Pull_request_type   string
     Tag                 string
+}
+
+// Return travis data.
+func getTravisData(decoder *json.Decoder) (string, string) {
+    var tEvent TRPayload
+    decoder.Decode(&tEvent)
+    if tEvent.Id > 0 {
+        event := "Travis: " + tEvent.Status_message + " for " +
+            tEvent.Repository.Name
+        desc := "Status: " + tEvent.Status_message +
+            "\n Duration: " + strconv.Itoa(tEvent.Duration) +
+            "\n Message: " + tEvent.Message +
+            "\n Build Number: " + tEvent.Number +
+            "\n Type: " + tEvent.Type +
+            "\n Compare URL: " + tEvent.Compare_url +
+            "\n Committer Name: " + tEvent.Committer_name +
+            "\n Build Url: " + tEvent.Build_url
+        return event, desc
+    }
+    return "", ""
 }
