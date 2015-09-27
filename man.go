@@ -195,7 +195,7 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
         event, desc := services.GetEventData(request)
-        context.Infof("%s: %s", webhook.Type, event)
+        context.Infof("%s: %s \n %s", webhook.Type, event, desc)
         if event != "" {
             if webhook.Type == "Trello" {
                 services.PushToTrello(

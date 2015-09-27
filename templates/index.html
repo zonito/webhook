@@ -30,20 +30,25 @@
       <paper-header-panel drawer>
         <div class="logo">Webhook.co</div>
         <div>
-          <paper-menu>
-            <paper-item>
-              <a href="/login" class="flex">Sign In / Register</a>
-            </paper-item>
-            <paper-item>
-              <a href="http://twitter.com/webhookco" target="_blank" class="flex">Follow on Twitter</a>
-            </paper-item>
-            <paper-item>
-              <a href="http://telegram.me/WebhookCo" target="_blank" class="flex">Join Chat on Telegram</a>
-            </paper-item>
-            <paper-item>
-              <a href="http://github.com/predictionguru/webhook" target="_blank" class="flex">Fork Github</a>
-            </paper-item>
-          </paper-menu>
+          <dom-module is="wh-menu">
+            <template>
+              <paper-menu>
+                <paper-item icon="lock" on-tap="menuSelected" mypath="/login">
+                  Sign In / Register
+                </paper-item>
+                <paper-item on-tap="menuSelected" mypath="http://twitter.com/webhookco">
+                  Follow on Twitter
+                </paper-item>
+                <paper-item mypath="http://telegram.me/WebhookCo" on-tap="menuSelected">
+                  Join Chat on Telegram
+                </paper-item>
+                <paper-item mypath="http://github.com/predictionguru/webhook" on-tap="menuSelected">
+                  Fork Github
+                </paper-item>
+              </paper-menu>
+            </template>
+          </dom-module>
+          <wh-menu></wh-menu>
         </div>
       </paper-header-panel>
       <paper-header-panel class="header" main>
@@ -132,5 +137,19 @@
         </paper-card>
       </paper-header-panel>
     </paper-drawer-panel>
+    <script>
+    Polymer({
+      is: 'wh-menu',
+      menuSelected: function (e) {
+        var mypath = e.currentTarget.getAttribute('mypath');
+        if (mypath.indexOf('/') !== 0) {
+          var win = window.open(mypath, '_blank');
+          win.focus();
+        } else {
+          location.href = mypath;
+        }
+      },
+    });
+    </script>
   </body>
 </html>
