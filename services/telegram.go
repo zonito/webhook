@@ -67,16 +67,11 @@ func GetChatIdFromCode(context appengine.Context, code string) (int, string) {
 
 // Send telegram message
 func SendTeleMessage(context appengine.Context, text string, chat_id int) {
-    var Url *url.URL
-    Url, _ = url.Parse(apiUrl)
-    parameters := url.Values{}
-    parameters.Add("parse_mode", "Markdown")
-    parameters.Add("disable_web_page_preview", "true")
-    parameters.Add("chat_id", strconv.Itoa(chat_id))
-    parameters.Add("text", text)
-    Url.RawQuery = parameters.Encode()
+    uri := apiUrl + "?parse_mode=Markdown&disable_web_page_preview=true"
+    uri += "&chat_id=" + strconv.Itoa(chat_id)
+    uri += "&text=" + url.QueryEscape(text)
     client := urlfetch.Client(context)
-    resp, _ := client.Get(Url.String())
+    resp, _ := client.Get(uri)
     defer resp.Body.Close()
 }
 
