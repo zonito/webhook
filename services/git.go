@@ -1,5 +1,9 @@
 package services
 
+import (
+    "encoding/json"
+)
+
 // Git structs
 
 type User struct {
@@ -34,4 +38,27 @@ type GitPayload struct {
     Compare    string
     Repository GitRepository
     Commits    []GitCommit
+}
+
+// Return github data.
+func getGithubData(decoder *json.Decoder, header string) (string, string) {
+    var gEvent GitPayload
+    decoder.Decode(&gEvent)
+    event := gEvent.Repository.Name + " --> " + header + " event"
+    repo := gEvent.Repository
+    desc := repo.Name + ": \n" +
+        "\nName: " + repo.Name +
+        "\nUrl: " + repo.Url +
+        "\nOwner: " + repo.Owner.Email +
+        "\nCompare: " + gEvent.Compare +
+        "\nRef: " + gEvent.Ref +
+        "\nModified files\n"
+    for i := 0; i < len(gEvent.Commits); i++ {
+        commit := gEvent.Commits[i]
+        desc += "\n* " + commit.Message + " (" + commit.Timestamp + ")"
+        for j := 0; j < len(commit.Modified); j++ {
+            desc += "\n * " + commit.Modified[j]
+        }
+    }
+    return event, desc
 }

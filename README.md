@@ -8,8 +8,8 @@
 
 ## Webhook supported
 
+* Bitbucket
 * Github (Only Push)
-* Bitbucket (Only Push)
 * Doorbell
 * Travis
 * Anymore? Please contribute
