@@ -13,6 +13,7 @@ import (
     "net/http"
     "services"
     "time"
+    "strings"
 )
 
 var redirectTmpl = template.Must(
@@ -219,9 +220,13 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
                 services.SendPushoverMessage(
                     context, event+"\n"+desc, webhook.POUserKey)
             } else if webhook.Type == "Hipchat" {
+                color := "red"
+                if strings.Index(event, " success ") > -1 {
+                    color = "green"
+                }
                 services.SendHipchatMessage(
                     context, event+"\n"+desc, webhook.HCRoomId,
-                    webhook.HCToken, "green")
+                    webhook.HCToken, color)
             }
         }
         fmt.Fprintf(writer, "OK")
