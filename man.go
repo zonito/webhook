@@ -12,8 +12,8 @@ import (
     "html/template"
     "net/http"
     "services"
-    "time"
     "strings"
+    "time"
 )
 
 var redirectTmpl = template.Must(
