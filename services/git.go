@@ -1,7 +1,6 @@
 package services
 
 import (
-    "appengine"
     "encoding/json"
 )
 
