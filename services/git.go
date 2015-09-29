@@ -33,11 +33,32 @@ type GitCommit struct {
     Modified  []string
 }
 
+type GitUser struct {
+    Login string
+    Id int
+    Avatar_url string
+    Type string
+    Site_admin bool
+}
+
+type GitPullRequest struct {
+    Url string
+    Id int
+    State string
+    Title string
+    User GitUser
+    Body string
+    Repo GitRepository
+}
+
 type GitPayload struct {
     Ref        string
     Compare    string
     Repository GitRepository
     Commits    []GitCommit
+    Action string
+    Number int
+    Pull_request GitPullRequest
 }
 
 // Return github data.

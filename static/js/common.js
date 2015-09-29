@@ -131,6 +131,9 @@
             if (data.po_userkey.length < 24) {
               $('.error').text('Invalid key.');
             }
+          } else if (service === 'hipchat') {
+            data.hc_token = $('#hc_token').val();
+            data.hc_roomid = $('#hc_roomid').val();
           }
           wh.ajax.request.createHook(data);
         }

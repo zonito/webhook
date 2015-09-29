@@ -56,6 +56,9 @@
                 <div class="app">
                   <img src="//storage.googleapis.com/pgwebhook/pushover.png" alt="pushover" />
                 </div>
+                <div class="app">
+                  <img src="//storage.googleapis.com/pgwebhook/hipchat.png" alt="hipchat" />
+                </div>
               </div>
               <div class="conf">
                 <div class="hide trello fields">
@@ -70,22 +73,31 @@
                     <input type="hidden" id="list_name" />
                   </div>
                 {{else}}
-                  <a href="/connect">Connect to Trello</a>
+                  <p>
+                    <a href="/connect">Connect to Trello</a>
+                  </p>
                 {{end}}
                 </div>
                 <div class="hide telegram">
                   <h2>Telegram</h2>
                   <paper-input label="Code" floatingLabel id="tele_code" maxlength="6"></paper-input>
-                  <div>
+                  <p>
                     Add <span><a href="https://telegram.me/WebhookCoBot" target="_blank">@WebhookCo</a></span> in Telegram, and generated code using <span>/getcode</span> command
-                  </div>
+                  </p>
                 </div>
                 <div class="hide pushover">
                   <h2>Pushover</h2>
                   <paper-input label="Your user key" floatingLabel id="po_userkey"></paper-input>
-                  <div>
+                  <p>
                     Copy your user key from <span><a href="https://pushover.net/" target="_blank">Pushover</a></span> and paste it here.
-                  </div>
+                  </p>
+                </div>
+                <div class="hide hipchat">
+                  <h2>Hipchat</h2>
+                  <paper-input label="Your bot token" floatingLabel id="hc_token"></paper-input>
+                  <paper-input label="Room Id" id="hc_roomid" auto-validate pattern="[0-9]+" error-message="Invalid room Id." floatingLabel id="hc_token" required></paper-input>
+                  <p>Go to <a href="http://hipchat.com/rooms">Rooms</a> > <b>Integrations</b> > <b>Build Your Own!</b>, Create your bot and share bot token & room Id here.
+                  </p>
                 </div>
               </div>
             </div>
