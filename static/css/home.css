@@ -57,6 +57,12 @@ paper-card.paper-card-0 .card-content {
 .list .pushover {
   background-image: url("https://storage.googleapis.com/pgwebhook/pushover.png");
 }
+.list .hipchat {
+  background-image: url("https://storage.googleapis.com/pgwebhook/hipchat.png");
+}
+.list .teamcity {
+  background-image: url("https://storage.googleapis.com/pgwebhook/teamcity.png");
+}
 .logo {
   background-image: url("https://storage.googleapis.com/pgwebhook/WebHook.png");
   background-position-y: 30px;
