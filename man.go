@@ -219,7 +219,7 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
                 services.SendPushoverMessage(
                     context, event+"\n"+desc, webhook.POUserKey)
             } else if webhook.Type == "Hipchat" {
-                services.services.SendHipchatMessage(
+                services.SendHipchatMessage(
                     context, event+"\n"+desc, webhook.HCRoomId,
                     webhook.HCToken, "green")
             }
