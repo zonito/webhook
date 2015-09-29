@@ -20,6 +20,8 @@ type Webhook struct {
     TeleChatId   int       `json:"tele_chat_id"`
     TeleChatName string    `json:"tele_name"`
     POUserKey    string    `json:"-"`
+    HCToken      string    `json:"-"`
+    HCRoomId     string    `json:"room"`
     Date         time.Time `json:"date"`
     Count        int       `json:"count"`
 }

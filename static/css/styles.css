@@ -42,7 +42,7 @@ paper-dialog .pad {
 .pad {
   padding: 0 16px;
 }
-.telegram a, .pushover a {
+.hide a {
     color: #2481CC;
     text-decoration: none;
 }

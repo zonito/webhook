@@ -55,6 +55,8 @@ func GetEventData(request *http.Request) (string, string) {
         return getBitbucketData(decoder, request.Header.Get("X-Event-Key"))
     case "travis":
         return getTravisData(decoder)
+    case "teamcity":
+        return getTeamcityData(decoder)
     }
     return "", ""
 }
@@ -69,6 +71,8 @@ func getHookType(request *http.Request) string {
         return "bitbucket"
     } else if request.Header.Get("Travis-Repo-Slug") != "" {
         return "travis"
+    } else if strings.Index(request.Header.Get("User-Agent"), "Jakarta") > -1 {
+        return "teamcity"
     }
     return ""
 }
