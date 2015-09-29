@@ -162,6 +162,17 @@ func save(writer http.ResponseWriter, request *http.Request) {
             response.Success = false
             response.Reason = "Invalid key."
         }
+    } else if request.FormValue("service") == "hipchat" {
+        webhook.Type = "Hipchat"
+        webhook.HCToken = request.FormValue("hc_token")
+        webhook.HCRoomId = request.FormValue("hc_roomid")
+        status := services.SendHipchatMessage(
+            context, "You are connected!", webhook.HCRoomId,
+            webhook.HCToken, "green")
+        if !status {
+            response.Success = false
+            response.Reason = "Invalid room id or token."
+        }
     }
     if response.Success {
         key := datastore.NewIncompleteKey(
@@ -207,6 +218,10 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
             } else if webhook.Type == "Pushover" {
                 services.SendPushoverMessage(
                     context, event+"\n"+desc, webhook.POUserKey)
+            } else if webhook.Type == "Hipchat" {
+                services.services.SendHipchatMessage(
+                    context, event+"\n"+desc, webhook.HCRoomId,
+                    webhook.HCToken, "green")
             }
         }
         fmt.Fprintf(writer, "OK")
