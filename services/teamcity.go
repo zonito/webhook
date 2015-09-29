@@ -44,7 +44,7 @@ func getTeamcityData(decoder *json.Decoder) (string, string) {
     build := tcEvent.Build
     event := build.ProjectName + ": " +
         build.BuildResult + " (Previous: " + build.BuildResultPrevious + ") "
-    desc := build.Message + "\n Build Status Url: " +
+    desc := build.Message + "\nBuild Status Url: " +
         build.BuildStatusUrl
     return event, desc
 }
