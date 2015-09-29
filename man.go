@@ -223,6 +223,8 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
                 color := "red"
                 if strings.Index(event, " success ") > -1 {
                     color = "green"
+                } else if strings.Index(event, " pull request ") > -1 {
+                    color = "purple"
                 }
                 services.SendHipchatMessage(
                     context, event+"\n"+desc, webhook.HCRoomId,
