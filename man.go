@@ -221,7 +221,8 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
                     context, event+"\n"+desc, webhook.POUserKey)
             } else if webhook.Type == "Hipchat" {
                 color := "red"
-                if strings.Index(event, " success ") > -1 {
+                if strings.Index(event, " success ") > -1 ||
+                    strings.Index(event, " merged ") > -1 {
                     color = "green"
                 } else if strings.Index(event, " pull ") > -1 {
                     color = "yellow"
