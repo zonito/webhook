@@ -66,13 +66,16 @@
             <div class="pad">
               <div class="url">http://webhook.co/<span>{{item.handler}}</span></div>
               <div class="info">
-                <span>{{item.type}}</span> >>
+                <span>{{item.type}}</span>
                 <template is="dom-if" if="{{isTrello(item)}}">
-                  Board: <span>{{item.board_name}}</span> >
+                  >> Board: <span>{{item.board_name}}</span> >
                   List: <span>{{item.list_name}}</span>
                 </template>
                 <template is="dom-if" if="{{isTelegram(item)}}">
-                  Chat: <span>{{item.tele_name}}</span>
+                  >> Chat: <span>{{item.tele_name}}</span>
+                </template>
+                <template is="dom-if" if="{{isHipchat(item)}}">
+                  >> Room Id: <span>{{item.room}}</span>
                 </template>
               </div>
             </div>
@@ -95,6 +98,9 @@
     },
     isTelegram: function (item) {
       return item.type === 'Telegram';
+    },
+    isHipchat: function (item) {
+      return item.type === 'Hipchat';
     },
     copy: function (e) {
       wh.util.clip($('.url', $(e.target).parent().parent()).text().trim());
