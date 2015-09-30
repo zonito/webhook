@@ -42,14 +42,16 @@ type GitUser struct {
 }
 
 type GitPullRequest struct {
-    Url      string
-    Html_url string
-    Id       int
-    State    string
-    Title    string
-    User     GitUser
-    Body     string
-    Repo     GitRepository
+    Url       string
+    Html_url  string
+    Id        int
+    State     string
+    Title     string
+    User      GitUser
+    Body      string
+    Repo      GitRepository
+    Merged    bool
+    Merged_by GitUser
 }
 
 type GitPayload struct {
@@ -91,6 +93,8 @@ func getGithubData(decoder *json.Decoder, header string) (string, string) {
         if gEvent.Action == "opened" {
             event = "New pull request for " + gEvent.Repository.Full_name +
                 " from " + pr.User.Login
+        } else if gEvent.Action == "closed" && pr.Merged {
+            event = "Pull request merged by " + pr.Merged_by.Login
         }
         desc = "Title: " + pr.Title
         if pr.Body != "" {
