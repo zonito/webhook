@@ -39,11 +39,11 @@ func getResponse(context appengine.Context, url string) string {
 func GetEventData(request *http.Request) (string, string) {
     hookType := getHookType(request)
     var decoder *json.Decoder
-    if hookType != "travis" {
-        decoder = json.NewDecoder(request.Body)
-    } else {
+    if hookType == "travis" {
         payload := request.FormValue("payload")
         decoder = json.NewDecoder(strings.NewReader(payload))
+    } else {
+        decoder = json.NewDecoder(request.Body)
     }
     switch hookType {
     case "github":
