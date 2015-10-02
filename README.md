@@ -6,6 +6,8 @@
 
 **Solution**: Webhook.co is the solution, where you just generate short webhook url and add it to your favorite development tool and choose other side where do you want to receive updates.
 
+**More about webhooks**: https://vimeo.com/4537957
+
 ## Webhook supported
 
 * Bitbucket
