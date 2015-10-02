@@ -164,7 +164,7 @@ func getBitbucketData(decoder *json.Decoder, eType string) (string, string) {
         case "commit_comment_created":
             event = bEvent.Repository.Name + ": Commit Comment Created"
             desc = who + " commented on " + bEvent.Commit.Hash
-            desc += "\n Comment: " + bEvent.Comment.Content.Markup
+            desc += "\n Comment: " + bEvent.Comment.Content.Raw
             desc += "\n File: " + bEvent.Comment.Inline.Path
         }
     } else if action[0] == "pullrequest" {
@@ -188,7 +188,7 @@ func getBitbucketData(decoder *json.Decoder, eType string) (string, string) {
             desc += "\n **Rejected** because " + bEvent.Pullrequest.Reason
         case "comment_created":
             desc += "\n Commented by: " + who
-            desc += "\n Comment: " + bEvent.Comment.Content.Markup
+            desc += "\n Comment: " + bEvent.Comment.Content.Raw
             desc += "\n File: " + bEvent.Comment.Inline.Path + " at line " +
                 strconv.Itoa(bEvent.Comment.Inline.To)
         case "comment_updated":
