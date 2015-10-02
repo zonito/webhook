@@ -201,7 +201,7 @@ func getBitbucketData(decoder *json.Decoder, eType string) (string, string) {
                 strconv.Itoa(bEvent.Comment.Inline.To)
         }
         event = bEvent.Repository.Name + ": Pull request " + action[1] + ": " +
-            bEvent.Pullrequest.Title + "(" + bEvent.Pullrequest.State + ")"
+            bEvent.Pullrequest.Title + " (" + bEvent.Pullrequest.State + ")"
     }
     return event, desc
 }
