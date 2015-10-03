@@ -66,11 +66,11 @@
                   <h2 class="margin">Trello</h2>
                   <div>
                     Board: <select id="boards"></select>
-                    <input type="hidden" id="board_name" />
+                    <input type="hidden" id="boardName" />
                   </div>
                   <div class="list hide">
                     List: <select id="lists"></select>
-                    <input type="hidden" id="list_name" />
+                    <input type="hidden" id="listName" />
                   </div>
                 {{else}}
                   <p>
@@ -80,22 +80,22 @@
                 </div>
                 <div class="hide telegram">
                   <h2>Telegram</h2>
-                  <paper-input label="Code" floatingLabel id="tele_code" maxlength="6"></paper-input>
+                  <paper-input label="Code" floatingLabel id="teleCode" maxlength="6"></paper-input>
                   <p>
                     Add <span><a href="https://telegram.me/WebhookCoBot" target="_blank">@WebhookCo</a></span> in Telegram, and generated code using <span>/getcode</span> command
                   </p>
                 </div>
                 <div class="hide pushover">
                   <h2>Pushover</h2>
-                  <paper-input label="Your user key" floatingLabel id="po_userkey"></paper-input>
+                  <paper-input label="Your user key" floatingLabel id="poUserkey"></paper-input>
                   <p>
                     Copy your user key from <span><a href="https://pushover.net/" target="_blank">Pushover</a></span> and paste it here.
                   </p>
                 </div>
                 <div class="hide hipchat">
                   <h2>Hipchat</h2>
-                  <paper-input label="Your bot token" floatingLabel id="hc_token"></paper-input>
-                  <paper-input label="Room Id" id="hc_roomid" auto-validate pattern="[0-9]+" error-message="Invalid room Id." floatingLabel id="hc_token" required></paper-input>
+                  <paper-input label="Your bot token" floatingLabel id="hcToken"></paper-input>
+                  <paper-input label="Room Id" id="hcRoomid" auto-validate pattern="[0-9]+" error-message="Invalid room Id." floatingLabel id="hcToken" required></paper-input>
                   <p>Go to <a href="http://hipchat.com/rooms">Rooms</a> > <b>Integrations</b> > <b>Build Your Own!</b>, Create your bot and share bot token & room Id here.
                   </p>
                 </div>

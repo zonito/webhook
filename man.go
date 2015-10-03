@@ -136,17 +136,17 @@ func save(writer http.ResponseWriter, request *http.Request) {
     }
     if request.FormValue("service") == "trello" {
         webhook.Type = "Trello"
-        webhook.BoardId = request.FormValue("board_id")
-        webhook.BoardName = request.FormValue("board_name")
-        webhook.ListId = request.FormValue("list_id")
-        webhook.ListName = request.FormValue("list_name")
+        webhook.BoardId = request.FormValue("boardId")
+        webhook.BoardName = request.FormValue("boardName")
+        webhook.ListId = request.FormValue("listId")
+        webhook.ListName = request.FormValue("listName")
         services.PushToTrello(
             context, webhook.ListId,
             getAccessToken(context, webhook.User), "You are connected!", "")
     } else if request.FormValue("service") == "telegram" {
         webhook.Type = "Telegram"
         webhook.TeleChatId, webhook.TeleChatName = services.GetChatIdFromCode(
-            context, request.FormValue("tele_code"))
+            context, request.FormValue("teleCode"))
         if webhook.TeleChatId == 0 {
             response.Success = false
             response.Reason = "Invalid code."
@@ -156,7 +156,7 @@ func save(writer http.ResponseWriter, request *http.Request) {
         }
     } else if request.FormValue("service") == "pushover" {
         webhook.Type = "Pushover"
-        webhook.POUserKey = request.FormValue("po_userkey")
+        webhook.POUserKey = request.FormValue("poUserkey")
         status := services.SendPushoverMessage(
             context, "You are connected!", webhook.POUserKey)
         if status == 0 {
@@ -165,8 +165,8 @@ func save(writer http.ResponseWriter, request *http.Request) {
         }
     } else if request.FormValue("service") == "hipchat" {
         webhook.Type = "Hipchat"
-        webhook.HCToken = request.FormValue("hc_token")
-        webhook.HCRoomId = request.FormValue("hc_roomid")
+        webhook.HCToken = request.FormValue("hcToken")
+        webhook.HCRoomId = request.FormValue("hcRoomid")
         status := services.SendHipchatMessage(
             context, "You are connected!", webhook.HCRoomId,
             webhook.HCToken, "green")
