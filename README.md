@@ -6,6 +6,8 @@
 
 **Solution**: Webhook.co is the solution, where you just generate short webhook url and add it to your favorite development tool and choose other side where do you want to receive updates.
 
+**More about webhooks**: https://vimeo.com/4537957
+
 ## Webhook supported
 
 * Bitbucket
@@ -29,6 +31,8 @@
 ## Deploy to your Google App Engine
 
 * Clone it `git clone`.
+* instal and run `quack` [Quack](https://github.com/Autodesk/quack)
+* Install and run `bower install`
 * Update `constants.go` with respective details.
 * Deploy to your GAE application (Make sure you update `app.yaml`).
 
