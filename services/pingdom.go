@@ -14,19 +14,13 @@ type PDMessage struct {
     IncidentId  int
 }
 
-type PDPayload struct {
-    Message PDMessage
-}
-
 func getPingdomData(decoder *json.Decoder) (string, string) {
-    var pdEvent PDPayload
+    var pdEvent PDMessage
     decoder.Decode(&pdEvent)
-    message := pdEvent.Message
-    event := "Pingdom: " + message.Description +
-        " for " + message.Host
-    desc := "Checkname: " + message.Checkname +
-        "\nCheck: " + message.Check +
-        "\nIncident Id: " + strconv.Itoa(message.IncidentId) +
-        "\nAction: " + message.Action
+    event := "Pingdom: " + pdEvent.Host + " " + pdEvent.Description
+    desc := "More Info\nCheckname: " + pdEvent.Checkname +
+        "\nCheck: " + pdEvent.Check +
+        "\nIncident Id: " + strconv.Itoa(pdEvent.IncidentId) +
+        "\nAction: " + pdEvent.Action
     return event, desc
 }

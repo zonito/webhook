@@ -42,6 +42,9 @@ func GetEventData(request *http.Request) (string, string) {
     if hookType == "travis" {
         payload := request.FormValue("payload")
         decoder = json.NewDecoder(strings.NewReader(payload))
+    } else if hookType == "pingdom" {
+        message := request.FormValue("message")
+        decoder = json.NewDecoder(strings.NewReader(message))
     } else {
         decoder = json.NewDecoder(request.Body)
     }
@@ -57,6 +60,8 @@ func GetEventData(request *http.Request) (string, string) {
         return getTravisData(decoder)
     case "teamcity":
         return getTeamcityData(decoder)
+    case "pingdom":
+        return getPingdomData(decoder)
     }
     return "", ""
 }
@@ -73,6 +78,8 @@ func getHookType(request *http.Request) string {
         return "travis"
     } else if strings.Index(request.Header.Get("User-Agent"), "Jakarta") > -1 {
         return "teamcity"
+    } else if request.FormValue("message") != "" {
+        return "pingdom"
     }
     return ""
 }
