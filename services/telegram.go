@@ -14,7 +14,7 @@ import (
     "time"
 )
 
-const apiUrl = "https://api.telegram.org/bot" + teleToken + "/sendMessage?"
+const apiURL = "https://api.telegram.org/bot" + teleToken + "/sendMessage?"
 
 // model
 
@@ -70,7 +70,7 @@ func GetChatIdFromCode(context appengine.Context, code string) (int, string) {
 
 // Send telegram message
 func SendTeleMessage(context appengine.Context, text string, chat_id int) {
-    uri := apiUrl + "?parse_mode=Markdown&disable_web_page_preview=true"
+    uri := apiURL + "?parse_mode=Markdown&disable_web_page_preview=true"
     uri += "&chat_id=" + strconv.Itoa(chat_id)
     uri += "&text=" + url.QueryEscape(text)
     client := urlfetch.Client(context)
