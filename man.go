@@ -223,7 +223,7 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
                 color := "red"
                 if strings.Index(event, " success ") > -1 ||
                     strings.Index(event, " merged ") > -1 ||
-                    strings.Index(event, ": up ") > -1 ||
+                    strings.Index(event, " up") > -1 ||
                     strings.Index(event, "Ping!") > -1 {
                     color = "green"
                 } else if strings.Index(event, " pull ") > -1 {
