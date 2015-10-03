@@ -1,6 +1,7 @@
-// Package services provides Telegram Integration (https://telegram.org/).
-// This is service to interact with / to notify.
-
+/*
+Package services provides Telegram Integration (https://telegram.org/).
+This is service to interact with / to notify.
+*/
 package services
 
 import (
@@ -16,17 +17,16 @@ import (
 
 const apiURL = "https://api.telegram.org/bot" + teleToken + "/sendMessage?"
 
-// A TeleVerify model is a temporary database to store code from bot.
-type TeleVerify struct {
+// TeleVerify model is a temporary database to store code from bot.
+type teleVerify struct {
     ChatId int
     Code   string
     Date   time.Time
     Name   string
 }
 
-// Telegram
-
-type TeleUser struct {
+// teleUser is part of teleMessage to know, who messaged.
+type teleUser struct {
     Id         int
     First_name string
     Last_name  string
@@ -34,30 +34,32 @@ type TeleUser struct {
     Title      string
 }
 
-type TeleMessage struct {
+// teleMessage is a message sent in telegram.
+type teleMessage struct {
     Message_id     int
     Date           int
     Text           string
-    From           TeleUser
-    Chat           TeleUser
+    From           teleUser
+    Chat           teleUser
     New_chat_title string
 }
 
-type TelePayload struct {
+// telePayload is a request body from telegram.
+type telePayload struct {
     Update_id int
-    Message   TeleMessage
+    Message   teleMessage
 }
 
 // Return TeleVerify datastore key.
 func teleVerifyKey(context appengine.Context, code string) *datastore.Key {
-    return datastore.NewKey(context, "TeleVerify", code, 0, nil)
+    return datastore.NewKey(context, "teleVerify", code, 0, nil)
 }
 
 // GetChatIdFromCode Return Chat id from Code
 func GetChatIdFromCode(context appengine.Context, code string) (int, string) {
-    query := datastore.NewQuery("TeleVerify").Ancestor(
+    query := datastore.NewQuery("teleVerify").Ancestor(
         teleVerifyKey(context, code)).Limit(1)
-    teleVerify := make([]TeleVerify, 0, 1)
+    teleVerify := make([]teleVerify, 0, 1)
     keys, _ := query.GetAll(context, &teleVerify)
     if len(teleVerify) > 0 {
         chatId, name := teleVerify[0].ChatId, teleVerify[0].Name
@@ -81,14 +83,14 @@ func SendTeleMessage(context appengine.Context, text string, chat_id int) {
 func Telegram(
     context appengine.Context, decoder *json.Decoder, token string) string {
     if token != teleToken {
-        return "NOT OK"
+        return "!OK"
     }
-    var teleEvent TelePayload
+    var teleEvent telePayload
     decoder.Decode(&teleEvent)
     message := teleEvent.Message
     if strings.Index(message.Text, "/getcode") > -1 {
         code := GetAlphaNumberic(6)
-        teleVerify := TeleVerify{
+        teleVerify := teleVerify{
             ChatId: message.Chat.Id,
             Code:   code,
             Date:   time.Now(),
@@ -98,7 +100,7 @@ func Telegram(
             teleVerify.Name = message.Chat.Title
         }
         key := datastore.NewIncompleteKey(
-            context, "TeleVerify", teleVerifyKey(context, code))
+            context, "teleVerify", teleVerifyKey(context, code))
         datastore.Put(context, key, &teleVerify)
         SendTeleMessage(context, code, message.Chat.Id)
     } else if strings.Index(message.Text, "/start") > -1 {

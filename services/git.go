@@ -1,3 +1,5 @@
+// Package services provides Github Integration.
+
 package services
 
 import (
