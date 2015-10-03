@@ -1,4 +1,4 @@
-// Telegram Integration (https://telegram.org/).
+// Package services provides Telegram Integration (https://telegram.org/).
 // This is service to interact with / to notify.
 
 package services
@@ -14,10 +14,9 @@ import (
     "time"
 )
 
-const apiUrl = "https://api.telegram.org/bot" + teleToken + "/sendMessage?"
+const apiURL = "https://api.telegram.org/bot" + teleToken + "/sendMessage?"
 
-// model
-
+// A TeleVerify model is a temporary database to store code from bot.
 type TeleVerify struct {
     ChatId int
     Code   string
@@ -54,7 +53,7 @@ func teleVerifyKey(context appengine.Context, code string) *datastore.Key {
     return datastore.NewKey(context, "TeleVerify", code, 0, nil)
 }
 
-// Return Chat id from Code
+// GetChatIdFromCode Return Chat id from Code
 func GetChatIdFromCode(context appengine.Context, code string) (int, string) {
     query := datastore.NewQuery("TeleVerify").Ancestor(
         teleVerifyKey(context, code)).Limit(1)
@@ -68,9 +67,9 @@ func GetChatIdFromCode(context appengine.Context, code string) (int, string) {
     return 0, ""
 }
 
-// Send telegram message
+// SendTeleMessage Send telegram message
 func SendTeleMessage(context appengine.Context, text string, chat_id int) {
-    uri := apiUrl + "?parse_mode=Markdown&disable_web_page_preview=true"
+    uri := apiURL + "?parse_mode=Markdown&disable_web_page_preview=true"
     uri += "&chat_id=" + strconv.Itoa(chat_id)
     uri += "&text=" + url.QueryEscape(text)
     client := urlfetch.Client(context)
