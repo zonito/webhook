@@ -31,6 +31,8 @@
 ## Deploy to your Google App Engine
 
 * Clone it `git clone`.
+* instal and run `quack` [Quack](https://github.com/Autodesk/quack)
+* Install and run `bower install`
 * Update `constants.go` with respective details.
 * Deploy to your GAE application (Make sure you update `app.yaml`).
 
