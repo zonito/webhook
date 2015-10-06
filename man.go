@@ -24,15 +24,16 @@ var redirectTmpl = template.Must(
 func init() {
     route := mux.NewRouter()
     route.HandleFunc("/", root)
-    route.HandleFunc("/login", login)
     route.HandleFunc("/cb", callback)
     route.HandleFunc("/connect", connect)
     route.HandleFunc("/created.json", createdJson)
-    route.HandleFunc("/w{handler}", hooks)
+    route.HandleFunc("/delete/{handler}", deleteHandler)
+    route.HandleFunc("/login", login)
     route.HandleFunc("/redirect", redirect)
     route.HandleFunc("/save", save)
     route.HandleFunc("/telegram/{telegramToken}", telegramWebhook)
     route.HandleFunc("/trello/{type}/{boardid}", trelloList)
+    route.HandleFunc("/w{handler}", hooks)
     http.Handle("/", route)
 }
 
@@ -184,6 +185,25 @@ func save(writer http.ResponseWriter, request *http.Request) {
             return
         }
         response.Handler = handler
+    }
+    writer.Header().Set("Content-Type", "application/json")
+    resp, _ := json.Marshal(response)
+    fmt.Fprintf(writer, string(resp))
+}
+
+func deleteHandler(writer http.ResponseWriter, request *http.Request) {
+    vars := mux.Vars(request)
+    context := appengine.NewContext(request)
+    appUser := user.Current(context)
+    response := Response{
+        Success: false,
+        Reason:  "Not found",
+    }
+    webhook := getWebhookFromHandler(context, vars["handler"])
+    if webhook != nil && webhook.User == appUser.Email {
+        response.Success = true
+        response.Reason = ""
+        deleteWebhookFromHandler(context, vars["handler"])
     }
     writer.Header().Set("Content-Type", "application/json")
     resp, _ := json.Marshal(response)

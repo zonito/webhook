@@ -30,7 +30,7 @@ wh-created .item {
   margin: 20px 20px 0 20px;
   padding: 20px;
 }
-wh-created .item span {
+wh-created .item span:not(.nostyle) {
   font-size: 20px;
   margin-right: 5px;
   margin-top: 8px;

@@ -66,7 +66,7 @@
             <div class="pad">
               <div class="url">http://webhook.co/<span>{{item.handler}}</span></div>
               <div class="info">
-                <span>{{item.type}}</span>
+                <span class="nostyle">{{item.type}}</span>
                 <template is="dom-if" if="{{isTrello(item)}}">
                   >> Board: <span>{{item.board_name}}</span> >
                   List: <span>{{item.list_name}}</span>
@@ -81,7 +81,7 @@
             </div>
             <paper-icon-button class="ripple green copy" on-tap="copy" icon="content-copy">
             </paper-icon-button>
-            <paper-icon-button class="ripple red" icon="delete">
+            <paper-icon-button class="ripple red" icon="delete" on-tap="deleteHandler">
             </paper-icon-button>
           </div>
         </div>
@@ -90,7 +90,8 @@
     <template is="dom-if" if="{{isEmpty(data)}}">
       <div>
         <div class="item">
-          <span>No webhook created.</span> <paper-button autofocus raised class="colorful" on-tap="newHook">Create New</paper-button>
+          <span>No webhook created.</span>
+          <paper-button autofocus raised class="colorful" on-tap="newHook">Create New</paper-button>
         </div>
       </div>
     </template>
@@ -117,6 +118,22 @@
     },
     newHook: function () {
       $("#modal")[0].toggle();
+    },
+    deleteHandler: function (e) {
+      $.ajax({
+          method: "POST",
+          url: "/delete/" + $('.url span', $(e.target).parent().parent()).text().trim()
+        }).done(function (data) {
+          if (data.success) {
+            setTimeout(function(){
+              $('iron-ajax')[0].generateRequest();
+            }, 1000);
+            $("#toast").attr("text", "Deleted");
+          } else {
+            $("#toast").attr("text", data.reason);
+          }
+          $("#toast")[0].show();
+        });
     }
   });
 }());

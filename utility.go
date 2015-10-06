@@ -49,3 +49,17 @@ func getWebhookFromHandler(
     }
     return nil
 }
+
+// Delete handler.
+func deleteWebhookFromHandler(
+    context appengine.Context, handler string) *Webhook {
+    query := datastore.NewQuery("Webhook").Ancestor(
+        webhookKey(context, handler)).Limit(1)
+    webhook := make([]Webhook, 0, 1)
+    keys, _ := query.GetAll(context, &webhook)
+    if len(webhook) > 0 {
+        datastore.Delete(context, keys[0])
+        return &webhook[0]
+    }
+    return nil
+}
