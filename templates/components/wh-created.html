@@ -87,6 +87,13 @@
         </div>
       </template>
     </iron-list>
+    <template is="dom-if" if="{{isEmpty(data)}}">
+      <div>
+        <div class="item">
+          <span>No webhook created.</span> <paper-button autofocus raised class="colorful" on-tap="newHook">Create New</paper-button>
+        </div>
+      </div>
+    </template>
   </template>
 </dom-module>
 <script>
@@ -104,6 +111,12 @@
     },
     copy: function (e) {
       wh.util.clip($('.url', $(e.target).parent().parent()).text().trim());
+    },
+    isEmpty: function (data) {
+      return !data.length;
+    },
+    newHook: function () {
+      $("#modal")[0].toggle();
     }
   });
 }());

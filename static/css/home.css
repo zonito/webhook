@@ -63,6 +63,9 @@ paper-card.paper-card-0 .card-content {
 .list .teamcity {
   background-image: url("https://storage.googleapis.com/pgwebhook/teamcity.png");
 }
+.list .pingdom {
+  background-image: url("https://storage.googleapis.com/pgwebhook/pingdom.png");
+}
 .logo {
   background-image: url("https://storage.googleapis.com/pgwebhook/WebHook.png");
   background-position-y: 30px;
@@ -77,7 +80,7 @@ paper-card.paper-card-0 .card-content {
 }
 #drawer.paper-drawer-panel > [drawer] {
   background-color: #F7F8FA;
-  box-shadow: -2px 170px 2px 0px rgba(138, 138, 138, 0.18) inset;
+  box-shadow: -2px 1px 5px 0 rgba(138, 138, 138, 0.18) inset;
 }
 paper-menu paper-item {
   cursor: pointer;
@@ -85,4 +88,8 @@ paper-menu paper-item {
 }
 paper-menu {
   background-color: rgba(0, 0, 0, 0) !important;
+}
+.infograph {
+  max-width: 706px;
+  width: 100%;
 }
