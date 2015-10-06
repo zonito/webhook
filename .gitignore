@@ -26,3 +26,4 @@ _testmain.go
 github.com/gorilla/context
 github.com/gorilla/mux
 bower_components/
+keys.json

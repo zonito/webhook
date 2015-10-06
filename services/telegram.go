@@ -15,7 +15,7 @@ import (
     "time"
 )
 
-const apiURL = "https://api.telegram.org/bot" + teleToken + "/sendMessage?"
+var apiURL = "https://api.telegram.org/bot" + teleToken + "/sendMessage"
 
 // TeleVerify model is a temporary database to store code from bot.
 type teleVerify struct {

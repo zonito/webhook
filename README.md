@@ -14,6 +14,7 @@
 * Github (Only Push)
 * Doorbell
 * Travis
+* Pingdom
 * Anymore? Please contribute
 
 ## Connected Services
@@ -33,7 +34,7 @@
 * Clone it `git clone`.
 * instal and run `quack` [Quack](https://github.com/Autodesk/quack)
 * Install and run `bower install`
-* Update `constants.go` with respective details.
+* Add `services/keys.json` with respective details.
 * Deploy to your GAE application (Make sure you update `app.yaml`).
 
 ## Contributing
