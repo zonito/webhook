@@ -22,6 +22,7 @@
 * Trello
 * Telegram (@WebhookCo)
 * Pushover
+* Hipchat
 * Pushbullet (Yet to start)
 * Anymore? Please contribute
 
