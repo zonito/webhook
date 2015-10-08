@@ -234,8 +234,12 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
                     context, webhook.ListId,
                     getAccessToken(context, webhook.User), event, desc)
             } else if webhook.Type == "Telegram" {
+                description := desc
+                if len(desc) > 500 {
+                    description = desc[:500] + "..."
+                }
                 services.SendTeleMessage(
-                    context, event+"\n"+desc, webhook.TeleChatId)
+                    context, event+"\n"+description, webhook.TeleChatId)
             } else if webhook.Type == "Pushover" {
                 services.SendPushoverMessage(
                     context, event+"\n"+desc, webhook.POUserKey)
