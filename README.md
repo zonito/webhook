@@ -17,7 +17,7 @@ Webhook.co provide hooks for most popular platforms such as [Github](https://dev
 * **Push**: is used to receive data in real time.
 * **Plugins**: is used to process data and return something.
 
-Webhook.co team let you offer a URL which is used to access all the APIs. The same URL works for accessing all the hooks and services offered by us. Our team is dedicated to offering these services as easy as possible to our client, users, and developers. We also listen to our end-users for any modification, features, queries or issues in order to make our service more flexible, durable and easy to use.
+Webhook.co let you offer a URL which is used to access all the APIs. The same URL works for accessing all the hooks and services offered. Please do create [new issue](https://github.com/PredictionGuru/webhook/issues) for any modification, features, queries in order to make our service more flexible, durable and easy to use.
 
 
 ## Webhook supported
