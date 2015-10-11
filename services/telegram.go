@@ -74,6 +74,7 @@ func SendTeleMessage(context appengine.Context, text string, chat_id int) {
     uri := apiURL + "?parse_mode=Markdown&disable_web_page_preview=true"
     uri += "&chat_id=" + strconv.Itoa(chat_id)
     uri += "&text=" + url.QueryEscape(text)
+    context.Infof("%s", uri)
     client := urlfetch.Client(context)
     resp, _ := client.Get(uri)
     defer resp.Body.Close()
