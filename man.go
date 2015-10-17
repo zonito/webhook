@@ -227,6 +227,8 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
         event, desc := services.GetEventData(request)
+        event = strings.Replace(event, "_", "\\_", -1)
+        desc = strings.Replace(desc, "_", "\\_", -1)
         context.Infof("%s: %s \n %s", webhook.Type, event, desc)
         if event != "" {
             if webhook.Type == "Trello" {
