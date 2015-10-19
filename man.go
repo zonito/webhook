@@ -227,8 +227,6 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
     webhook := getWebhookFromHandler(context, handler)
     if webhook != nil {
         event, desc := services.GetEventData(request)
-        event = strings.Replace(event, "_", "\\_", -1)
-        desc = strings.Replace(desc, "_", "\\_", -1)
         context.Infof("%s: %s \n %s", webhook.Type, event, desc)
         if event != "" {
             if webhook.Type == "Trello" {
@@ -236,6 +234,8 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
                     context, webhook.ListId,
                     getAccessToken(context, webhook.User), event, desc)
             } else if webhook.Type == "Telegram" {
+                event = strings.Replace(event, "_", "\\_", -1)
+                desc = strings.Replace(desc, "_", "\\_", -1)
                 services.SendTeleMessage(
                     context, event+"\n"+desc, webhook.TeleChatId)
             } else if webhook.Type == "Pushover" {
