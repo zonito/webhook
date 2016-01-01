@@ -62,6 +62,8 @@ func GetEventData(request *http.Request) (string, string) {
         return getTeamcityData(decoder)
     case "pingdom":
         return getPingdomData(decoder)
+    case "jenkins":
+        return getJenkinsJobNoficationData(decoder)
     }
     return "", ""
 }
@@ -80,6 +82,8 @@ func getHookType(request *http.Request) string {
         return "teamcity"
     } else if request.FormValue("message") != "" {
         return "pingdom"
+    } else if strings.Index(request.Header.Get("User-Agent"), "Java/1.8") > -1 {
+        return "jenkins"
     }
     return ""
 }
