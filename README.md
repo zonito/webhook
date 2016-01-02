@@ -28,6 +28,7 @@ Webhook.co let you offer a URL which is used to access all the APIs. The same UR
 * [Travis](http://docs.travis-ci.com/user/notifications/#Webhook-notification)
 * [Pingdom](https://help.pingdom.com/hc/en-us/articles/203611322-Setting-up-a-Webhook-and-an-Alerting-Endpoint)
 * [TeamCity](https://www.jetbrains.com/teamcity/)
+* [Jenkins - Job Notification](https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin)
 * Anymore? Please contribute
 
 ## Connected Services

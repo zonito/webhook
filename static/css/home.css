@@ -66,6 +66,9 @@ paper-card.paper-card-0 .card-content {
 .list .pingdom {
   background-image: url("https://storage.googleapis.com/pgwebhook/pingdom.png");
 }
+.list .jenkins {
+  background-image: url("https://www.cloudbees.com/sites/default/files/headshot.png");
+}
 .logo {
   background-image: url("https://storage.googleapis.com/pgwebhook/Webhook.png");
   background-position-y: 30px;
