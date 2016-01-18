@@ -72,6 +72,8 @@ func GetEventData(request *http.Request) (string, string) {
 
 // Return type of hook.
 func getHookType(request *http.Request) string {
+    context := appengine.NewContext(request)
+    context.Infof("%s", request.Header)
     if request.Header.Get("X-Github-Event") != "" {
         return "github"
     } else if request.Header.Get("X-Sender") == "Doorbell" {
@@ -86,7 +88,9 @@ func getHookType(request *http.Request) string {
         return "pingdom"
     } else if strings.Index(request.Header.Get("User-Agent"), "Java/1.8") > -1 {
         return "jenkins"
-    } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 {
+    } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
+        strings.Index(
+            request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
         return "custom1"
     }
     return ""
