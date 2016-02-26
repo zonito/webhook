@@ -64,12 +64,21 @@ func GetEventData(request *http.Request) (string, string) {
         return getPingdomData(decoder)
     case "jenkins":
         return getJenkinsJobNoficationData(decoder)
+    case "custom1":
+        return getCustom1Data(decoder)
+    }
+    sd_event, sd_desc := getStackDriverData(decoder)
+    if strings.Index(sd_desc, "app.stackdriver.com/incidents/") > -1 {
+        return sd_event, sd_desc
     }
     return "", ""
 }
 
 // Return type of hook.
 func getHookType(request *http.Request) string {
+    context := appengine.NewContext(request)
+    context.Infof("%s", request.Header)
+    context.Infof("%s", request.Body)
     if request.Header.Get("X-Github-Event") != "" {
         return "github"
     } else if request.Header.Get("X-Sender") == "Doorbell" {
@@ -84,6 +93,10 @@ func getHookType(request *http.Request) string {
         return "pingdom"
     } else if strings.Index(request.Header.Get("User-Agent"), "Java/1.8") > -1 {
         return "jenkins"
+    } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
+        strings.Index(
+            request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
+        return "custom1"
     }
     return ""
 }
