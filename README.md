@@ -12,7 +12,7 @@ The popular applications which are already using web hooks include Assembla, Cal
 
 Webhook.co provides a specific URL to users for various events, a web application will POST the data to those URLs when an action perform. It is very simple to use and it’s up to you and whatever you want to accomplish. Using our service, developers can create notification for themselves, real-time synchronization with other app, validate the data and also prevent it from being used by the application and process the data and repost using various APIs.
 
-Webhook.co provide hooks for most popular platforms such as [Github](https://developer.github.com/webhooks/) (only push action), [Bitbucket](https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html), [Travis](http://docs.travis-ci.com/user/notifications/#Webhook-notification), [Doorbell.co](https://doorbell.io/docs/webhooks), [TeamCity](https://www.jetbrains.com/teamcity/) and [Pingdom](https://help.pingdom.com/hc/en-us/articles/203611322-Setting-up-a-Webhook-and-an-Alerting-Endpoint). We also offer services for [Telegram](http://www.telegram.org), [Pushover](http://pushover.net), [Hipchat](http://hipchat.com) and [Trello](http://www.trello.com). The service includes three types of actions:
+Webhook.co provide hooks for most popular platforms such as [Github](https://developer.github.com/webhooks/) (only push action), [Bitbucket](https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html), [Travis](http://docs.travis-ci.com/user/notifications/#Webhook-notification), [Doorbell.io](https://doorbell.io/docs/webhooks), [TeamCity](https://www.jetbrains.com/teamcity/) and [Pingdom](https://help.pingdom.com/hc/en-us/articles/203611322-Setting-up-a-Webhook-and-an-Alerting-Endpoint). We also offer services for [Telegram](http://www.telegram.org), [Pushover](http://pushover.net), [Hipchat](http://hipchat.com) and [Trello](http://www.trello.com). The service includes three types of actions:
 
 * **Push**: is used to receive data in real time.
 * **Plugins**: is used to process data and return something.
@@ -24,7 +24,7 @@ Webhook.co let you offer a URL which is used to access all the APIs. The same UR
 
 * [Bitbucket](https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html)
 * [Github](https://developer.github.com/webhooks/) (Only Push)
-* [Doorbell.co](https://doorbell.io/docs/webhooks)
+* [Doorbell.io](https://doorbell.io/docs/webhooks)
 * [Travis](http://docs.travis-ci.com/user/notifications/#Webhook-notification)
 * [Pingdom](https://help.pingdom.com/hc/en-us/articles/203611322-Setting-up-a-Webhook-and-an-Alerting-Endpoint)
 * [TeamCity](https://www.jetbrains.com/teamcity/)

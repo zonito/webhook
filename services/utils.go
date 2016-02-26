@@ -66,8 +66,10 @@ func GetEventData(request *http.Request) (string, string) {
         return getJenkinsJobNoficationData(decoder)
     case "custom1":
         return getCustom1Data(decoder)
-    case "stackdriver":
-        return getStackDriverData(decoder)
+    }
+    sd_event, sd_desc := getStackDriverData(decoder)
+    if strings.Index(sd_desc, "app.stackdriver.com/incidents/") > -1 {
+        return sd_event, sd_desc
     }
     return "", ""
 }
@@ -76,6 +78,7 @@ func GetEventData(request *http.Request) (string, string) {
 func getHookType(request *http.Request) string {
     context := appengine.NewContext(request)
     context.Infof("%s", request.Header)
+    context.Infof("%s", request.Body)
     if request.Header.Get("X-Github-Event") != "" {
         return "github"
     } else if request.Header.Get("X-Sender") == "Doorbell" {
@@ -94,11 +97,6 @@ func getHookType(request *http.Request) string {
         strings.Index(
             request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
         return "custom1"
-    }
-    var decoder *json.Decoder
-    decoder = json.NewDecoder(request.Body)
-    if strings.Index(sd_desc, "app.stackdriver.com/incidents/") > -1 {
-        return "stackdriver"
     }
     return ""
 }

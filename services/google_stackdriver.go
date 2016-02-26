@@ -4,13 +4,13 @@ import (
     "encoding/json"
 )
 
-type SDInstance struct {
+type SDIncident struct {
     Incident_id    string
     Resource_id    string
     Resource_name  string
     State          string
-    Started_at     string
-    Ended_at       string
+    Started_at     int
+    Ended_at       int
     Policy_name    string
     Condition_name string
     Url            string
@@ -18,16 +18,18 @@ type SDInstance struct {
 }
 
 type SDMessage struct {
-    Instance SDInstance
-    Version  string
+    Incident SDIncident
+    Version  int
 }
 
 func getStackDriverData(decoder *json.Decoder) (string, string) {
     var sdnEvent SDMessage
     decoder.Decode(&sdnEvent)
-    event := "StackDriver: " + sdnEvent.Instance.Policy_name +
-        ", Condition: " + sdnEvent.Instance.Condition_name
-    desc := "URL: " + sdnEvent.Instance.Url +
-        "\nSummary: " + sdnEvent.Instance.Summary
+    event := "StackDriver: " + sdnEvent.Incident.Policy_name +
+        ", Condition: " + sdnEvent.Incident.Condition_name
+    desc := "URL: " + sdnEvent.Incident.Url +
+        "\nSummary: " + sdnEvent.Incident.Summary +
+        "\nState: " + sdnEvent.Incident.State +
+        "\nResource: " + sdnEvent.Incident.Resource_name
     return event, desc
 }
