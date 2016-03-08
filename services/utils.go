@@ -64,6 +64,8 @@ func GetEventData(request *http.Request) (string, string) {
         return getPingdomData(decoder)
     case "jenkins":
         return getJenkinsJobNoficationData(decoder)
+    case "fabric":
+        return getFabricData(decoder)
     case "custom1":
         return getCustom1Data(decoder)
     }
@@ -93,6 +95,8 @@ func getHookType(request *http.Request) string {
         return "pingdom"
     } else if strings.Index(request.Header.Get("User-Agent"), "Java/1.8") > -1 {
         return "jenkins"
+    } else if strings.Index(request.Header.Get("User-Agent"), "Faraday") > -1 {
+        return "fabric"
     } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
         strings.Index(
             request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
