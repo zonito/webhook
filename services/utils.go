@@ -48,6 +48,7 @@ func GetEventData(request *http.Request) (string, string) {
 	} else {
 		decoder = json.NewDecoder(request.Body)
 	}
+    context := appengine.NewContext(request)
     context.Infof("%s", hookType)
 	switch hookType {
 	case "github":
@@ -70,7 +71,7 @@ func GetEventData(request *http.Request) (string, string) {
 	case "custom1":
 		return getCustom1Data(decoder)
     case "stackdriver":
-        return getStackDriverData(decoder)
+        return getStackDriverData(decoder, request)
 	}
 	return "", ""
 }

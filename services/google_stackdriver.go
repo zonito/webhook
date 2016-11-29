@@ -1,7 +1,9 @@
 package services
 
 import (
+    "appengine"
     "encoding/json"
+    "net/http"
 )
 
 type SDIncident struct {
@@ -22,11 +24,14 @@ type SDMessage struct {
     Version  int
 }
 
-func getStackDriverData(decoder *json.Decoder) (string, string) {
+func getStackDriverData(decoder *json.Decoder, request *http.Request) (string, string) {
     var sdnEvent SDMessage
     decoder.Decode(&sdnEvent)
-    event := "StackDriver: " + sdnEvent.Incident.Policy_name +
-        ", Condition: " + sdnEvent.Incident.Condition_name
+    context := appengine.NewContext(request)
+    context.Infof("%s", decoder)
+    context.Infof("%s", sdnEvent.Incident.Policy_name)
+    event := "`StackDriver: " + sdnEvent.Incident.Policy_name +
+        ", Condition: " + sdnEvent.Incident.Condition_name + "`"
     desc := "URL: " + sdnEvent.Incident.Url +
         "\nSummary: " + sdnEvent.Incident.Summary +
         "\nState: " + sdnEvent.Incident.State +
