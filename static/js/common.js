@@ -131,6 +131,17 @@
               $(".error").text("Invalid code.");
               return;
             }
+          } else if (service === "slack") {
+            data.slack_url = $("#slack").val();
+            data.slack_channel = $("#slack_channel").val();
+            if (data.slack_url.search("https://hooks.slack.com/services/") === -1) {
+              $(".error").text("Invalid Slack URL.");
+              return;
+            }
+            if (data.slack_channel[0] !== '@' && data.slack_channel[0] !== '#') {
+              $(".error").text("Invalid Channel / Username.");
+              return;
+            }
           } else if (service === "pushover") {
             data.poUserkey = $("#poUserkey").val();
             if (data.poUserkey.length < 24) {

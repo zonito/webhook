@@ -66,6 +66,8 @@ func GetEventData(request *http.Request) (string, string) {
         return getJenkinsJobNoficationData(decoder)
     case "fabric":
         return getFabricData(decoder)
+    case "ad":
+        return getADData(decoder)
     case "custom1":
         return getCustom1Data(decoder)
     }
@@ -97,6 +99,8 @@ func getHookType(request *http.Request) string {
         return "jenkins"
     } else if strings.Index(request.Header.Get("User-Agent"), "Faraday") > -1 {
         return "fabric"
+    } else if request.Header.Get("x-adsk-delivery-id") != "" {
+        return "ad"
     } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
         strings.Index(
             request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
