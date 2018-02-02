@@ -39,10 +39,10 @@ type ADPayload struct {
 func getADData(decoder *json.Decoder) (string, string) {
     var dEvent ADPayload
     decoder.Decode(&dEvent)
-    event := dEvent.Hook.CreatorType + " Delete: " + dEvent.Hook.Status
+    event := dEvent.Hook.CreatorType + " Delete: `" + dEvent.Hook.Status + "`"
     desc := "`" + dEvent.ResourceUrn + "` created by `" +
         dEvent.Hook.CreatedBy + "`\nURN: `" + dEvent.Hook.Urn +
         "`,\nEventType: `" + dEvent.Hook.EventType + "`,\nTenant: `" +
-        dEvent.Hook.Tenant + "`"
+        dEvent.Hook.Tenant + "` \n HookID: `" + dEvent.Hook.HookId + "`"
     return event, desc
 }
