@@ -68,6 +68,8 @@ func GetEventData(request *http.Request) (string, string) {
         return getFabricData(decoder)
     case "ad":
         return getADData(decoder)
+    case "grafana":
+        return getGrafanaData(decoder)
     case "custom1":
         return getCustom1Data(decoder)
     }
@@ -99,6 +101,8 @@ func getHookType(request *http.Request) string {
         return "jenkins"
     } else if strings.Index(request.Header.Get("User-Agent"), "Faraday") > -1 {
         return "fabric"
+    } else if strings.Index(request.Header.Get("User-Agent"), "Grafana") > -1 {
+        return "grafana"
     } else if request.Header.Get("x-adsk-delivery-id") != "" {
         return "ad"
     } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
