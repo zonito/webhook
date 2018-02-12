@@ -11,5 +11,6 @@ type CMessage struct {
 func getCustomData(decoder *json.Decoder) (string, string) {
     var cEvent CMessage
     decoder.Decode(&cEvent)
-    return cEvent.Message, ""
+    event := cEvent.Message
+    return event, ""
 }

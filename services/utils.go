@@ -37,7 +37,9 @@ func getResponse(context appengine.Context, url string) string {
 
 // Return event type and description to post.
 func GetEventData(request *http.Request) (string, string) {
+    context := appengine.NewContext(request)
     hookType := getHookType(request)
+    context.Infof("HookType: %s", hookType)
     var decoder *json.Decoder
     if hookType == "travis" {
         payload := request.FormValue("payload")
@@ -71,7 +73,7 @@ func GetEventData(request *http.Request) (string, string) {
     case "grafana":
         return getGrafanaData(decoder)
     case "custom1":
-        return getCustom1Data(decoder)
+        return getCustomData(decoder)
     }
     sd_event, sd_desc := getStackDriverData(decoder)
     if strings.Index(sd_desc, "app.stackdriver.com/incidents/") > -1 {
