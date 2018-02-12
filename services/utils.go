@@ -106,8 +106,7 @@ func getHookType(request *http.Request) string {
     } else if request.Header.Get("x-adsk-delivery-id") != "" {
         return "ad"
     } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
-        strings.Index(
-            request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
+        request.Header.Get("X-Newrelic-Id") != "" {
         return "custom1"
     }
     return ""
