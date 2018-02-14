@@ -37,7 +37,9 @@ func getResponse(context appengine.Context, url string) string {
 
 // Return event type and description to post.
 func GetEventData(request *http.Request) (string, string) {
+    context := appengine.NewContext(request)
     hookType := getHookType(request)
+    context.Infof("HookType: %s", hookType)
     var decoder *json.Decoder
     if hookType == "travis" {
         payload := request.FormValue("payload")
@@ -66,8 +68,12 @@ func GetEventData(request *http.Request) (string, string) {
         return getJenkinsJobNoficationData(decoder)
     case "fabric":
         return getFabricData(decoder)
+    case "ad":
+        return getADData(decoder)
+    case "grafana":
+        return getGrafanaData(decoder)
     case "custom1":
-        return getCustom1Data(decoder)
+        return getCustomData(decoder)
     }
     sd_event, sd_desc := getStackDriverData(decoder)
     if strings.Index(sd_desc, "app.stackdriver.com/incidents/") > -1 {
@@ -97,9 +103,12 @@ func getHookType(request *http.Request) string {
         return "jenkins"
     } else if strings.Index(request.Header.Get("User-Agent"), "Faraday") > -1 {
         return "fabric"
+    } else if strings.Index(request.Header.Get("User-Agent"), "Grafana") > -1 {
+        return "grafana"
+    } else if request.Header.Get("x-adsk-delivery-id") != "" {
+        return "ad"
     } else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
-        strings.Index(
-            request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
+        request.Header.Get("X-Newrelic-Id") != "" {
         return "custom1"
     }
     return ""
