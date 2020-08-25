@@ -1,9 +1,11 @@
 package services
 
 import (
-	"appengine"
-	"appengine/urlfetch"
+	"context"
 	"encoding/json"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -19,17 +21,17 @@ const (
 )
 
 // Return url response
-func getResponse(context appengine.Context, url string) string {
+func getResponse(context context.Context, url string) string {
 	client := urlfetch.Client(context)
 	resp, err := client.Get(url)
 	if err != nil {
-		context.Infof("GetBoards client.Get: %v", err.Error())
+		log.Infof(context, "GetBoards client.Get: %v", err.Error())
 		return ""
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		context.Infof("GetBoards ioutil.ReadAll: %v", err.Error())
+		log.Infof(context, "GetBoards ioutil.ReadAll: %v", err.Error())
 		return ""
 	}
 	return string(body)
@@ -48,8 +50,8 @@ func GetEventData(request *http.Request) (string, string) {
 	} else {
 		decoder = json.NewDecoder(request.Body)
 	}
-    context := appengine.NewContext(request)
-    context.Infof("%s", hookType)
+	context := appengine.NewContext(request)
+	log.Infof(context, "%s", hookType)
 	switch hookType {
 	case "github":
 		return getGithubData(
@@ -70,8 +72,8 @@ func GetEventData(request *http.Request) (string, string) {
 		return getFabricData(decoder)
 	case "custom1":
 		return getCustom1Data(decoder)
-    case "stackdriver":
-        return getStackDriverData(decoder, request)
+	case "stackdriver":
+		return getStackDriverData(decoder, request)
 	}
 	return "", ""
 }
@@ -79,8 +81,8 @@ func GetEventData(request *http.Request) (string, string) {
 // Return type of hook.
 func getHookType(request *http.Request) string {
 	context := appengine.NewContext(request)
-	context.Infof("%s", request.Header)
-	context.Infof("%s", request.Body)
+	log.Infof(context, "%s", request.Header)
+	log.Infof(context, "%s", request.Body)
 	if request.Header.Get("X-Github-Event") != "" {
 		return "github"
 	} else if request.Header.Get("X-Sender") == "Doorbell" {
@@ -91,8 +93,8 @@ func getHookType(request *http.Request) string {
 		return "travis"
 	} else if strings.Index(request.Header.Get("User-Agent"), "Jakarta") > -1 {
 		return "teamcity"
-    } else if strings.Index(request.Header.Get("User-Agent"), "Google-Alerts") > -1 {
-        return "stackdriver"
+	} else if strings.Index(request.Header.Get("User-Agent"), "Google-Alerts") > -1 {
+		return "stackdriver"
 	} else if request.FormValue("message") != "" {
 		return "pingdom"
 	} else if strings.Index(request.Header.Get("User-Agent"), "Java/1.8") > -1 {
@@ -101,7 +103,7 @@ func getHookType(request *http.Request) string {
 		return "fabric"
 	} else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
 		strings.Index(
-			request.Header.Get("X-Newrelic-Id"), "XAMGV15QGwQJVllRDgQ=") > -1 {
+			request.Header.Get("x-newrelic-id"), "VwAOU1RRGwAFUFZUAwQE") > -1 {
 		return "custom1"
 	}
 	return ""

@@ -1,22 +1,22 @@
 package services
 
 import (
-    "encoding/json"
-    "io/ioutil"
+	"encoding/json"
+	"io/ioutil"
 )
 
 type Config struct {
-    PushoverKey  string
-    TrelloKey    string
-    TrelloSecret string
-    TeleToken    string
+	PushoverKey  string
+	TrelloKey    string
+	TrelloSecret string
+	TeleToken    string
 }
 
 func getConfig() Config {
-    content, _ := ioutil.ReadFile("services/keys.json")
-    var conf Config
-    json.Unmarshal(content, &conf)
-    return conf
+	content, _ := ioutil.ReadFile("services/keys.json")
+	var conf Config
+	json.Unmarshal(content, &conf)
+	return conf
 }
 
 var config = getConfig()
