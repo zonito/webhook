@@ -157,6 +157,13 @@ func save(writer http.ResponseWriter, request *http.Request) {
 			services.SendTeleMessage(
 				context, "You are connected!", webhook.TeleChatId)
 		}
+	} else if request.FormValue("service") == "slack" {
+		webhook.Type = "Slack"
+		webhook.SlackUrl = request.FormValue("slack_url")
+		webhook.SlackChannel = request.FormValue("slack_channel")
+		services.SendSlackMessage(
+			context, "You are connected!", webhook.SlackUrl,
+			webhook.SlackChannel)
 	} else if request.FormValue("service") == "pushover" {
 		webhook.Type = "Pushover"
 		webhook.POUserKey = request.FormValue("poUserkey")
@@ -243,6 +250,10 @@ func hooks(writer http.ResponseWriter, request *http.Request) {
 			} else if webhook.Type == "Pushover" {
 				services.SendPushoverMessage(
 					context, event+"\n"+desc, webhook.POUserKey)
+			} else if webhook.Type == "Slack" {
+				services.SendSlackMessage(
+					context, event+"\n"+desc, webhook.SlackUrl,
+					webhook.SlackChannel)
 			} else if webhook.Type == "Hipchat" {
 				color := "red"
 				if strings.Index(event, " success ") > -1 ||

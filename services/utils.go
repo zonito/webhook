@@ -39,7 +39,9 @@ func getResponse(context context.Context, url string) string {
 
 // Return event type and description to post.
 func GetEventData(request *http.Request) (string, string) {
+	context := appengine.NewContext(request)
 	hookType := getHookType(request)
+	log.Infof(context, "HookType: %s", hookType)
 	var decoder *json.Decoder
 	if hookType == "travis" {
 		payload := request.FormValue("payload")
@@ -50,8 +52,6 @@ func GetEventData(request *http.Request) (string, string) {
 	} else {
 		decoder = json.NewDecoder(request.Body)
 	}
-	context := appengine.NewContext(request)
-	log.Infof(context, "%s", hookType)
 	switch hookType {
 	case "github":
 		return getGithubData(
@@ -70,10 +70,16 @@ func GetEventData(request *http.Request) (string, string) {
 		return getJenkinsJobNoficationData(decoder)
 	case "fabric":
 		return getFabricData(decoder)
+	case "ad":
+		return getADData(decoder)
+	case "grafana":
+		return getGrafanaData(decoder)
 	case "custom1":
-		return getCustom1Data(decoder)
-	case "stackdriver":
-		return getStackDriverData(decoder, request)
+		return getCustomData(decoder)
+	}
+	sd_event, sd_desc := getStackDriverData(decoder)
+	if strings.Index(sd_desc, "app.stackdriver.com/incidents/") > -1 {
+		return sd_event, sd_desc
 	}
 	return "", ""
 }
@@ -93,17 +99,18 @@ func getHookType(request *http.Request) string {
 		return "travis"
 	} else if strings.Index(request.Header.Get("User-Agent"), "Jakarta") > -1 {
 		return "teamcity"
-	} else if strings.Index(request.Header.Get("User-Agent"), "Google-Alerts") > -1 {
-		return "stackdriver"
 	} else if request.FormValue("message") != "" {
 		return "pingdom"
 	} else if strings.Index(request.Header.Get("User-Agent"), "Java/1.8") > -1 {
 		return "jenkins"
 	} else if strings.Index(request.Header.Get("User-Agent"), "Faraday") > -1 {
 		return "fabric"
+	} else if strings.Index(request.Header.Get("User-Agent"), "Grafana") > -1 {
+		return "grafana"
+	} else if request.Header.Get("x-adsk-delivery-id") != "" {
+		return "ad"
 	} else if strings.Index(request.Header.Get("User-Agent"), "Custom1") > -1 ||
-		strings.Index(
-			request.Header.Get("x-newrelic-id"), "VwAOU1RRGwAFUFZUAwQE") > -1 {
+		request.Header.Get("X-Newrelic-Id") != "" {
 		return "custom1"
 	}
 	return ""

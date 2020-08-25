@@ -24,4 +24,6 @@ type Webhook struct {
 	HCRoomId     string    `json:"room"`
 	Date         time.Time `json:"date"`
 	Count        int       `json:"count"`
+	SlackUrl     string    `json:"slack_url"`
+	SlackChannel string    `json:"slack_channel"`
 }

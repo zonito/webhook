@@ -2,9 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
-	"net/http"
 )
 
 type SDIncident struct {
@@ -25,14 +22,11 @@ type SDMessage struct {
 	Version  int
 }
 
-func getStackDriverData(decoder *json.Decoder, request *http.Request) (string, string) {
+func getStackDriverData(decoder *json.Decoder) (string, string) {
 	var sdnEvent SDMessage
 	decoder.Decode(&sdnEvent)
-	context := appengine.NewContext(request)
-	log.Infof(context, "%s", decoder)
-	log.Infof(context, "%s", sdnEvent.Incident.Policy_name)
-	event := "`StackDriver: " + sdnEvent.Incident.Policy_name +
-		", Condition: " + sdnEvent.Incident.Condition_name + "`"
+	event := "StackDriver: " + sdnEvent.Incident.Policy_name +
+		", Condition: " + sdnEvent.Incident.Condition_name
 	desc := "URL: " + sdnEvent.Incident.Url +
 		"\nSummary: " + sdnEvent.Incident.Summary +
 		"\nState: " + sdnEvent.Incident.State +

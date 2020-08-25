@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 )
 
-type C1Message struct {
-	Message string
+type CMessage struct {
+	Message string `json:"message"`
 }
 
-func getCustom1Data(decoder *json.Decoder) (string, string) {
-	var cEvent C1Message
+func getCustomData(decoder *json.Decoder) (string, string) {
+	var cEvent CMessage
 	decoder.Decode(&cEvent)
 	event := cEvent.Message
 	return event, ""
